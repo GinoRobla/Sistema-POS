@@ -1,177 +1,202 @@
-# 🚀 Proyectos Personales | Gino Robla
+# 🛒 Sistema POS - Punto de Venta Web y Escritorio
 
-<div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=2196F3&center=true&vCenter=true&width=600&lines=Full+Stack+Developer+%7C+MERN+Stack;Soluciones+reales+para+negocios+reales;Transformando+ideas+en+c%C3%B3digo" alt="Typing SVG" />
-</div>
+> **Sistema completo de punto de venta con escaneo de códigos de barras, gestión de inventario y estadísticas en tiempo real**
 
-## 📖 Sobre este repositorio
+![Sistema POS - Escaneo de Códigos](./screenshots/ventas.gif)
+*Demostración en vivo: escaneando códigos de barras y agregando productos al carrito automáticamente*
 
-Bienvenido a mi portafolio de proyectos. Este espacio representa mi trabajo como **desarrollador Full Stack freelance**, donde cada proyecto resuelve problemas reales para clientes y negocios.
+## 💻 Versión de Escritorio (NUEVO)
 
-Aquí encontrarás soluciones desarrolladas con el **stack MERN** (MongoDB, Express, React, Node.js), sistemas de gestión empresarial y aplicaciones de escritorio
----
+**¡Ahora disponible como aplicación de escritorio!**
 
-## 🎯 Filosofía de Desarrollo
+- ✅ **Instalador de Windows** - Un solo archivo .exe
+- ✅ **100% Offline** - No requiere internet para funcionar
+- ✅ **Datos locales** - Base de datos SQLite incluida
+- ✅ **Fácil distribución** - Instala en cualquier PC sin dependencias
 
-- **Soluciones orientadas al negocio** - Código que resuelve problemas reales
-- **Arquitectura escalable** - Pensando en el crecimiento futuro
-- **Experiencia de usuario primero** - Interfaces intuitivas y funcionales
-- **Código limpio y mantenible** - Siguiendo principios SOLID y patrones MVC
+**Ver:** [Manual de Electron](./MANUAL.md) para instrucciones de instalación y distribución.
 
----
+## ✨ Características Principales
 
-## 🛠️ Stack Tecnológico
-
-### Frontend
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-
-### Backend & APIs
-![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
-![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
-![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
-
-### Databases
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
-
-### Tools & Other
-![Electron](https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+🛍️ **Sistema de Ventas** - Carrito interactivo con validación de stock  
+📦 **Gestión de Inventario** - CRUD completo de productos  
+📊 **Estadísticas Avanzadas** - Dashboard con métricas y reportes  
+📱 **Escaneo de Códigos** - Compatible con lectores físicos y app móvil  
+🔍 **Búsqueda Inteligente** - Por nombre, código o escaneo automático  
+📈 **Historial Completo** - Registro detallado de todas las ventas  
 
 ---
 
-## 📁 Proyectos
-
-### 🌟 Proyectos Completados (3)
-
-<table>
-  <tr>
-    <th width="25%">Proyecto</th>
-    <th width="40%">Descripción</th>
-    <th width="20%">Stack</th>
-    <th width="15%">Cliente</th>
-  </tr>
-  <tr>
-    <td><strong>💈 Sistema de Gestión de Barbería</strong></td>
-    <td>Plataforma web que moderniza la gestión de barberías, permitiendo a los clientes reservar turnos online y a los barberos administrarlos desde su agenda. El sistema incluye roles, gestión de servicios, precios, pagos y señas, recordatorios automáticos y un dashboard con métricas clave para el administrador.</td>
-    <td><strong>MERN Stack</strong><br>MongoDB, Express, React, Node.js</td>
-    <td>Peluquería Local</td>
-  </tr>
-  <tr>
-    <td><strong>🛒 Sistema POS (Punto de Venta)</strong></td>
-    <td>Sistema de escritorio diseñado para comercios, que permite registrar ventas mediante escáner de códigos de barras, gestionar el stock en tiempo real y analizar el rendimiento del negocio a través de un dashboard con indicadores clave. Funciona completamente offline, sin depender de conexión a internet.</td>
-    <td><strong>React + Electron</strong><br>Node.js, Express, SQLite</td>
-    <td>Panadería Familiar</td>
-  </tr>
-  <tr>
-    <td><strong>🌐 Red Social Full Stack</strong></td>
-    <td>Red social web que permite a los usuarios conectarse entre sí mediante un sistema de follow/unfollow, compartir contenido y visualizar un feed personalizado. La plataforma cuenta con autenticación segura mediante JWT y soporte para subida de archivos.</td>
-    <td><strong>MERN Stack</strong><br>MongoDB, Express, React, Node.js</td>
-    <td>Proyecto Personal</td>
-  </tr>
-</table>
-
-## 🏗️ Arquitectura y Buenas Prácticas
-
-Todos los proyectos implementan:
-
-- **🎯 Patrón MVC** - Separación clara de responsabilidades (Modelo-Vista-Controlador)
-- **🚀 APIs RESTful** - Endpoints documentados y versionados
-- **🔐 Autenticación segura** - JWT con refresh tokens
-- **💾 Optimización de consultas** - Paginación para grandes volúmenes de datos
-- **📱 Responsive Design** - Interfaces adaptables a todos los dispositivos
-- **⚡ Rendimiento** - Código optimizado y lazy loading
-
----
-
-## 📊 Estadísticas del Repositorio
-
-<div align="center">
-
-**Progreso Actual:**
-
-✅ **3 proyectos completados** | 🔨 **1 en desarrollo**
-
----
-
-**Tecnologías más utilizadas:**
-
-![](https://img.shields.io/badge/React-80%25-61DAFB?style=flat&logo=react&logoColor=white)
-![](https://img.shields.io/badge/Node.js-80%25-339933?style=flat&logo=node.js&logoColor=white)
-![](https://img.shields.io/badge/MongoDB-60%25-47A248?style=flat&logo=mongodb&logoColor=white)
-
-</div>
-
----
-
-## 🚀 Instalación y Uso
-
-Cada proyecto incluye:
-
-1. **📁 Código fuente** con estructura clara y documentada
-2. **📖 README detallado** con instrucciones paso a paso
-3. **⚙️ Variables de entorno** (.env.example incluido)
-4. **🗃️ Scripts SQL/MongoDB** para inicializar la base de datos
-5. **📦 Dependencias** claramente especificadas
+## 🚀 Instalación Rápida
 
 ```bash
-# Clonar el repositorio
+# 1️⃣ Clonar repositorio
 git clone https://github.com/GinoRobla/proyectos-personales.git
+cd "proyectos-personales/Sistema ventas"
 
-# Navegar al proyecto deseado
-cd proyectos-personales/[nombre-proyecto]
+# 2️⃣ Instalar dependencias
+cd backend && npm install
+cd ../frontend && npm install
 
-# Seguir las instrucciones del README específico de cada proyecto
+# 3️⃣ Configurar backend
+cd ../backend && cp .env.example .env
+
+# 4️⃣ Iniciar backend (Terminal 1)
+node index.js
+
+# 5️⃣ Poblar con datos de ejemplo (Terminal 2)
+node db/seedCompleto.js
+
+# 6️⃣ Iniciar frontend (Terminal 3)
+cd ../frontend && npm run dev
 ```
 
----
-
-## 🤝 Contribuciones
-
-¡Las contribuciones son bienvenidas! Si tenés ideas, mejoras o encontrás bugs:
-
-1. Fork del repositorio
-2. Creá una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -m 'Añadir nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abrí un Pull Request
+**🎉 ¡Listo! Abre http://localhost:5173**
 
 ---
 
-## 📞 Contacto
+## 📱 Escaneo de Códigos de Barras
 
-<div align="center">
+### Opción 1: Lector Físico
+Conecta cualquier lector USB/Bluetooth y funciona automáticamente.
 
-**¿Hablamos de tu proyecto?**
+### Opción 2: App Móvil (Barcode to PC Server)
 
-[![Email](https://img.shields.io/badge/Email-ginoroblabelleggia@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:ginoroblabelleggia@gmail.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Gino_Robla-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/gino-robla-803a9337b/)
-[![GitHub](https://img.shields.io/badge/GitHub-GinoRobla-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GinoRobla)
+1. **📲 Instalar en el celular:**
+   - Descargar "Barcode to PC Server" desde Play Store/App Store
 
-**📍 Bahía Blanca, Argentina** | Disponible para trabajo remoto
+2. **💻 Instalar en la PC:**
+   - Descargar desde [barcodetopc.com](https://barcodetopc.com)
 
-</div>
+3. **📶 Configuración:**
+   - Conectar ambos dispositivos a la **misma red WiFi**
+   - Iniciar la app en el celular
+   - Abrir el programa en la PC
+   - ¡Ya puedes escanear desde el móvil!
+
+### 🎯 Funcionamiento Automático
+- Escanea cualquier código → se busca automáticamente el producto
+- No necesitas hacer clic en campos de búsqueda
+- El producto se agrega al carrito instantáneamente
 
 ---
 
-## ⭐ ¿Te gustó este repositorio?
+## 🖥️ Interfaz y Navegación
 
-Si este repositorio te resultó útil o interesante, **¡dale una estrella!** ⭐
+### 🏠 **Ventas**
+![Sistema de Ventas - Carrito](./screenshots/ventas.gif)
+*Demostración del carrito de compras interactivo en funcionamiento*
+- Búsqueda y selección de productos
+- Carrito de compras interactivo
+- Finalización de ventas con impresión
 
-Tu apoyo motiva a seguir creando y compartiendo soluciones con la comunidad.
+### 📦 **Inventario**  
+![Gestión de Inventario](./screenshots/inventario.png)
+- Agregar, editar y eliminar productos
+- Control de stock automático
+- Imágenes de productos
+
+### 📊 **Estadísticas**
+![Dashboard de Estadísticas](./screenshots/estadisticas2.png)
+- Ganancias de hoy/semana/mes
+- Top productos más vendidos
+- Análisis por rangos de fecha
+- Productos con poco stock
+
+### 📋 **Historial**
+![Historial de Ventas](./screenshots/historial.png)
+![Filtrado y Paginación](./screenshots/historial2.png)
+- Registro completo de ventas
+- Filtrado por fechas
+- Detalles de cada venta
+- Paginación inteligente
 
 ---
 
+## ⚙️ Arquitectura y Tecnologías
 
-<div align="center">
-  
-  **💡 Transformando problemas reales en soluciones digitales**
-  
-  <sub>Hecho con ❤️ y mucho ☕ por Gino Robla</sub>
-  
-</div>
+### 🎯 **Stack Principal**
+
+#### **Frontend - React + Vite**
+- **React 19**: Framework para UI con hooks personalizados (`useApi`, `useCart`, `useScanner`)
+- **Vite**: Bundler rápido con hot reload para desarrollo ágil
+- **CSS3 Puro**: Estilos optimizados sin dependencias externas
+
+#### **Backend - Node.js + Express**
+- **Express 5**: API REST con arquitectura modular (Controllers/Services/Models)
+- **Sequelize ORM**: Abstracción de base de datos con soporte dual SQLite/PostgreSQL
+
+#### **Base de Datos - Estrategia Dual**
+- **SQLite**: Para desarrollo local, sin instalaciones externas
+- **PostgreSQL**: Preparado para producción, escalabilidad empresarial
+
+### 🖥️ **Diseñado para PC/Notebook**
+
+#### **Optimización Desktop**
+- **Pantallas grandes**: Layout optimizado para resoluciones 1580px+ 
+- **Responsive notebook**: Adaptación específica para pantallas <1675px (3→2 columnas en inventario)
+- **No mobile**: Interfaz pensada para uso profesional en escritorio
+- **Teclado físico**: Integración perfecta con lectores de códigos USB/Bluetooth
+
+### ⚡ **Experiencia Sin Fricción**
+
+#### **Auto-enfoque Inteligente**
+- **Inputs activos**: Los campos de búsqueda se enfocan automáticamente
+- **Escaneo directo**: Los códigos se capturan sin hacer clic en campos
+- **Limpieza automática**: Cada escaneo borra el contenido anterior
+- **Mínimo mouse**: El usuario puede operar casi completamente con el lector
+
+#### **Flujo Optimizado**
+```
+🔍 Escanear código → 🎯 Producto encontrado → ➕ Al carrito → 🔍 Listo para siguiente
+```
+
+### 🔧 **Optimizaciones de Rendimiento**
+
+#### **Paginación Server-Side**
+- **Historial**: Solo 10 ventas por página para carga rápida
+- **Sin lag**: Navegación fluida entre páginas
+- **Memoria eficiente**: No carga miles de registros innecesarios
+
+#### **Búsqueda Instantánea**
+- **Tiempo real**: Resultados mientras escribes
+- **Índices optimizados**: Búsqueda por nombre y código de barras
+- **Validación automática**: Stock verificado antes de agregar al carrito
+
+#### **Gestión de Stock Automática**
+- **Transacciones atómicas**: Venta + reducción de stock en una operación
+- **Validaciones**: Previene sobreventa automáticamente
+- **Actualización instantánea**: Los cambios se reflejan inmediatamente  
+
+---
+
+## 📚 Documentación Adicional
+
+- 📖 **[Documentación de API](./DOCUMENTACION_API.md)** - Endpoints completos
+- 🔧 **Configuración avanzada** - Variables de entorno
+- 🧪 **Datos de prueba** - Scripts de seeders incluidos
+
+---
+
+## 🎯 Estado del Proyecto
+
+✅ **Funcional al 100%** - Listo para uso en entornos reales  
+✅ **Base de datos local** - Sin dependencias externas  
+✅ **Responsive design** - Optimizado para escritorio  
+✅ **Escaneo automático** - Integración perfecta con códigos de barras  
+
+---
+
+## 📞 Soporte
+
+¿Problemas con la instalación? ¿Dudas sobre el uso?
+
+- 📧 Abrir un **Issue** en GitHub
+- 💡 Consultar la **documentación de API**
+- 🔍 Revisar los **archivos de ejemplo**
+
+---
+
+**Desarrollado con ❤️ para facilitar la gestión de ventas e inventario**
+
+*Sistema POS Web v1.0 - Listo para producción* ✨
