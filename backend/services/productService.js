@@ -3,9 +3,25 @@
 const { Product } = require('../models/Product');
 const { Op } = require('sequelize');
 
-// 1. OBTENER TODOS LOS PRODUCTOS (ordenados por nombre) con paginación
+function obtenerCodigosAlternativos(codigo) {
+    const codigoTexto = String(codigo ?? '').trim();
+    const codigoSinCeros = codigoTexto.replace(/^0+/, '');
+    const codigoConCeroInicial = codigoTexto.length === 12 ? `0${codigoTexto}` : '';
+    const codigoSinUltimoDigito = codigoTexto.length === 13 ? codigoTexto.slice(0, -1) : '';
+    const codigoSinPrimerDigito = codigoTexto.length === 13 ? codigoTexto.slice(1) : '';
+
+    return [...new Set([
+        codigoTexto,
+        codigoSinCeros,
+        codigoConCeroInicial,
+        codigoSinUltimoDigito,
+        codigoSinPrimerDigito
+    ].filter(Boolean))];
+}
+
+// 1. OBTENER TODOS LOS PRODUCTOS (ordenados por nombre) con paginaciÃ³n
 async function obtenerTodosLosProductos(limit = 100, offset = 0) {
-    // Limitar a máximo 1000 registros por solicitud para evitar sobrecargar el sistema
+    // Limitar a mÃ¡ximo 1000 registros por solicitud para evitar sobrecargar el sistema
     const limiteSanitizado = Math.min(limit, 1000);
 
     const productos = await Product.findAll({
@@ -24,21 +40,41 @@ async function obtenerTodosLosProductos(limit = 100, offset = 0) {
     };
 }
 
-// 2. BUSCAR UN PRODUCTO POR SU CÓDIGO DE BARRAS O ID
+// 2. BUSCAR UN PRODUCTO POR SU CÃ“DIGO DE BARRAS O ID
 async function buscarProductoPorCodigo(codigo) {
+    const codigoTexto = String(codigo ?? '').trim();
+
     const producto = await Product.findOne({
         where: {
             [Op.or]: [
-                { barcode: codigo },
-                { id: codigo }
+                { barcode: codigoTexto },
+                { id: codigoTexto }
             ]
         }
     });
-    if (!producto) throw new Error('Producto no encontrado');
-    return producto;
+
+    if (producto) return producto;
+
+    const codigosAlternativos = obtenerCodigosAlternativos(codigoTexto).filter(
+        (codigoAlternativo) => codigoAlternativo !== codigoTexto
+    );
+
+    if (codigosAlternativos.length > 0) {
+        const productoAlternativo = await Product.findOne({
+            where: {
+                barcode: {
+                    [Op.in]: codigosAlternativos
+                }
+            }
+        });
+
+        if (productoAlternativo) return productoAlternativo;
+    }
+
+    throw new Error('Producto no encontrado');
 }
 
-// 3. BUSCAR PRODUCTOS POR NOMBRE O CÓDIGO
+// 3. BUSCAR PRODUCTOS POR NOMBRE O CÃ“DIGO
 async function buscarProductos(textoBusqueda) {
     return await Product.findAll({
         where: {
@@ -53,15 +89,15 @@ async function buscarProductos(textoBusqueda) {
 
 // 4. CREAR UN NUEVO PRODUCTO
 async function crearProducto(datosProducto) {
-    // Limpiar datos: convertir strings vacíos en null para campos opcionales
+    // Limpiar datos: convertir strings vacÃ­os en null para campos opcionales
     const datosLimpios = { ...datosProducto };
     if (datosLimpios.barcode === '') datosLimpios.barcode = null;
     if (datosLimpios.image === '') datosLimpios.image = null;
 
-    // Verificar si el código de barras ya existe (solo si no es null/vacío)
+    // Verificar si el cÃ³digo de barras ya existe (solo si no es null/vacÃ­o)
     if (datosLimpios.barcode) {
         const existe = await Product.findOne({ where: { barcode: datosLimpios.barcode } });
-        if (existe) throw new Error('Ya existe un producto con ese código de barras');
+        if (existe) throw new Error('Ya existe un producto con ese cÃ³digo de barras');
     }
     const producto = await Product.create(datosLimpios);
     return producto;
@@ -72,12 +108,12 @@ async function actualizarProducto(idProducto, datosActualizados) {
     const producto = await Product.findByPk(idProducto);
     if (!producto) throw new Error('Producto no encontrado');
 
-    // Limpiar datos: convertir strings vacíos en null para campos opcionales
+    // Limpiar datos: convertir strings vacÃ­os en null para campos opcionales
     const datosLimpios = { ...datosActualizados };
     if (datosLimpios.barcode === '') datosLimpios.barcode = null;
     if (datosLimpios.image === '') datosLimpios.image = null;
 
-    // Verificar si el código de barras ya existe en otro producto (solo si no es null/vacío)
+    // Verificar si el cÃ³digo de barras ya existe en otro producto (solo si no es null/vacÃ­o)
     if (datosLimpios.barcode && datosLimpios.barcode !== producto.barcode) {
         const existe = await Product.findOne({
             where: {
@@ -85,7 +121,7 @@ async function actualizarProducto(idProducto, datosActualizados) {
                 id: { [Op.ne]: idProducto }
             }
         });
-        if (existe) throw new Error('Ya existe un producto con ese código de barras');
+        if (existe) throw new Error('Ya existe un producto con ese cÃ³digo de barras');
     }
 
     // Actualizar todos los campos proporcionados

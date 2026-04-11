@@ -43,6 +43,11 @@ export const buscarProductoPorCodigo = async (codigo) => {
     return hacerPeticion(`${URL_BASE}/api/products/barcode/${codigo}`)
 }
 
+export const buscarProductos = async (textoBusqueda) => {
+    const query = encodeURIComponent(textoBusqueda)
+    return hacerPeticion(`${URL_BASE}/api/products/search?q=${query}`)
+}
+
 export const crearProducto = async (datosProducto) => {
     return hacerPeticion(`${URL_BASE}/api/products`, {
         method: 'POST',
@@ -97,6 +102,7 @@ export const obtenerProductosPocoStock = async () => {
 const apiClient = {
     obtenerProductos,
     buscarProductoPorCodigo,
+    buscarProductos,
     crearProducto,
     actualizarProducto,
     eliminarProducto,

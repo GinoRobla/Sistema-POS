@@ -1,113 +1,99 @@
-/* Estilos base para el componente DateFilter */
 .date-filter-component {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 1rem;
     align-items: end;
 }
 
 .date-inputs {
     display: flex;
-    gap: 15px;
+    gap: 1rem;
     align-items: end;
 }
 
 .date-inputs.vertical {
     flex-direction: column;
     align-items: stretch;
-    gap: 15px;
 }
 
 .input-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0.35rem;
 }
 
 .input-group label {
-    font-weight: 500;
-    color: #2c3e50;
-    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    font-size: 0.92rem;
 }
 
 .input-group input[type="date"] {
-    padding: 0.75rem;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 1rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    font-size: 0.98rem;
     min-width: 150px;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: #fff;
+    color: var(--text-strong);
 }
 
 .input-group input[type="date"]:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    border-color: var(--primary);
 }
 
 .date-buttons {
     display: flex;
-    gap: 10px;
+    gap: 0.75rem;
     align-items: end;
 }
 
-.search-btn, .clear-btn {
-    padding: 0.75rem 1.5rem;
+.search-btn,
+.clear-btn {
+    padding: 0.85rem 1.15rem;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
-    min-width: 100px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    min-width: 110px;
 }
 
 .search-btn {
-    background-color: #3498db;
+    background: var(--primary);
     color: white;
 }
 
-.search-btn:hover:not(:disabled) {
-    background-color: #2980b9;
+.search-btn:hover:not(:disabled),
+.clear-btn:hover {
     transform: translateY(-1px);
 }
 
 .search-btn:disabled {
-    background-color: #bdc3c7;
+    background: #bdc3c7;
     cursor: not-allowed;
     transform: none;
 }
 
 .clear-btn {
-    background-color: #95a5a6;
-    color: white;
+    background: #eef3f9;
+    color: var(--text-strong);
 }
 
-.clear-btn:hover {
-    background-color: #7f8c8d;
-    transform: translateY(-1px);
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-    .date-filter-component {
+    .date-filter-component,
+    .date-inputs,
+    .date-buttons {
+        width: 100%;
         flex-direction: column;
         align-items: stretch;
-        gap: 15px;
     }
-    
-    .date-inputs {
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    
-    .date-buttons {
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    
-    .search-btn, .clear-btn {
-        flex: 1;
-        min-width: 120px;
+
+    .search-btn,
+    .clear-btn {
+        width: 100%;
     }
 }

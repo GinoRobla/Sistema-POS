@@ -1,158 +1,210 @@
-html, body {
+:root {
+    color-scheme: light;
+    --sidebar-width: 250px;
+    --sidebar-width-tablet: 200px;
+    --content-max: 1440px;
+    --content-narrow: 820px;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --shadow-sm: 0 10px 30px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 18px 45px rgba(15, 23, 42, 0.1);
+    --bg-app: #f3f6fb;
+    --bg-surface: #ffffff;
+    --bg-soft: #eef3f9;
+    --border-subtle: #dbe4f0;
+    --border-strong: #c5d2e1;
+    --text-strong: #132033;
+    --text-muted: #607086;
+    --primary: #1f6feb;
+    --primary-strong: #1959ba;
+    --success: #1f9d63;
+    --success-soft: #ebf9f1;
+    --warning: #c97a10;
+    --danger: #d14343;
+    --danger-soft: #fff0f0;
+    --focus-ring: 0 0 0 4px rgba(31, 111, 235, 0.18);
+    --font-body: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+html,
+body {
+    height: 100%;
     overflow-x: hidden;
 }
-/* ===== LAYOUT GLOBAL ===== */
-/* Reset básico y configuración del scroll */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-html, body {
-    height: 100%;
-    overflow-x: hidden; /* Sin scroll horizontal */
+body {
+    background: radial-gradient(circle at top, #ffffff 0%, var(--bg-app) 45%, #eaf0f7 100%);
+    color: var(--text-strong);
+    font-family: var(--font-body);
 }
 
-#root {
-    height: 100%;
+button,
+input,
+textarea,
+select {
+    font: inherit;
 }
 
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+#root,
 .layout {
     height: 100%;
 }
 
-/* Layout principal de la aplicación */
 .app-layout {
     display: flex;
     height: 100vh;
-    overflow: hidden; /* Evita scroll en el contenedor principal */
+    overflow: hidden;
 }
 
-/* Contenido principal - scroll solo cuando sea necesario */
 .main-content {
-    margin-left: 250px;
+    margin-left: var(--sidebar-width);
     flex: 1;
     height: 100vh;
-    overflow-y: auto; /* Scroll vertical solo cuando sea necesario */
-    overflow-x: hidden; /* Sin scroll horizontal */
-    background: #f8f9fa;
-    scroll-behavior: smooth; /* Scroll suave */
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: transparent;
+    scroll-behavior: smooth;
 }
 
-/* === RESPONSIVE DESIGN === */
-
-/* Tablets (768px - 1024px) */
-@media (max-width: 1024px) and (min-width: 769px) {
-    .main-content {
-        margin-left: 200px; /* Sidebar más angosto para tablets */
-    }
-    
-    .sidebar {
-        width: 200px; /* Sidebar más angosto */
-    }
-    
-    /* Ajustar padding general */
-    .sales-view,
-    .inventory,
-    .stats-container {
-        padding: 20px 25px;
-    }
+.mobile-topbar {
+    display: none;
 }
 
-/* Tablets pequeñas y móviles (768px o menos) */
-@media (max-width: 768px) {
-    /* Ajustar contenido principal para que no tenga margen izquierdo en móviles */
-    .main-content {
-        margin-left: 0 !important;
-    }
-    
-    /* Sidebar en móviles - mantener pero con overlay */
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        z-index: 2000;
-        width: 250px; /* Mantener ancho original en móvil */
-    }
-    
-    /* Cuando el sidebar esté activo en móvil */
-    .sidebar.sidebar-mobile-active {
-        transform: translateX(0);
-    }
-    
-    /* Overlay para cerrar sidebar en móvil */
-    .sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1500;
-        display: none;
-    }
-    
-    .sidebar-overlay.active {
-        display: block;
-    }
+.sales-view,
+.inventory,
+.historial-container,
+.stats-container {
+    width: 100%;
+    max-width: var(--content-max);
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: var(--space-8) clamp(1rem, 3vw, 2.5rem) var(--space-10);
 }
 
-/* Notebooks y pantallas grandes (1025px+) */
-@media (min-width: 1025px) {
-    .main-content {
-        margin-left: 250px; /* Sidebar ancho completo */
-    }
-    
-    /* Optimizar espaciado para pantallas grandes */
-    .sales-view,
-    .inventory,
-    .stats-container {
-        padding: 30px 40px;
-        max-width: 1600px;
-        margin-left: 250px;
-        margin-right: auto;
-    }
+.page-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
 }
 
-/* Configuración específica para cada vista */
+.page-title {
+    color: var(--text-strong);
+    font-size: clamp(1.7rem, 2vw, 2.3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+}
+
+.page-subtitle {
+    max-width: 720px;
+    color: var(--text-muted);
+    font-size: 1.02rem;
+    line-height: 1.6;
+}
+
+.header-separator {
+    width: 100%;
+    height: 1px;
+    margin: 0 0 var(--space-8) 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(96, 112, 134, 0.18) 10%,
+        rgba(96, 112, 134, 0.45) 50%,
+        rgba(96, 112, 134, 0.18) 90%,
+        transparent 100%
+    );
+}
+
+.content-card {
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(219, 228, 240, 0.9);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(6px);
+}
+
+.feedback-panel {
+    width: 100%;
+    text-align: center;
+    padding: 1rem 1.15rem;
+    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
+    background: rgba(255, 255, 255, 0.82);
+    color: var(--text-muted);
+    box-shadow: var(--shadow-sm);
+}
+
+.feedback-panel-info {
+    background: #eaf3ff;
+    border-color: #cfe0ff;
+    color: var(--primary);
+}
+
+.feedback-panel-danger {
+    background: var(--danger-soft);
+    border-color: rgba(209, 67, 67, 0.2);
+    color: var(--danger);
+}
+
+.feedback-panel-empty {
+    background: rgba(255, 255, 255, 0.76);
+    border-style: dashed;
+}
+
 .sales-view {
-    height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-/* Para las otras vistas que necesitan scroll */
-.inventory-view,
-.historial-view,
-.stats-view {
-    min-height: 100vh;
-    height: auto;
-}
-
-/* Configuración específica del carrito en Sales */
 .sales-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Sin scroll en el contenedor */
+    overflow: hidden;
 }
 
 .cart-section {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Sin scroll en la sección */
-    min-height: 0; /* Permite que flexbox funcione correctamente */
+    overflow: hidden;
+    min-height: 0;
 }
 
 .cart-items {
     flex: 1;
-    overflow-y: auto; /* Scroll solo en la lista de productos del carrito */
+    overflow-y: auto;
     overflow-x: hidden;
-    padding-right: 5px; /* Espacio para el scrollbar */
+    padding-right: 5px;
 }
 
-/* Scrollbar personalizado global */
 .main-content::-webkit-scrollbar,
 .cart-items::-webkit-scrollbar {
     width: 8px;
@@ -175,68 +227,130 @@ html, body {
     background: #a8a8a8;
 }
 
-/* Ocultar scrollbar en Firefox pero mantener funcionalidad */
 .main-content,
 .cart-items {
     scrollbar-width: thin;
     scrollbar-color: #c1c1c1 #f1f1f1;
 }
 
-/* === UTILIDADES RESPONSIVE === */
-
-/* Ocultar elementos en diferentes tamaños de pantalla */
-.hide-on-mobile {
-    display: block;
-}
-
-.hide-on-tablet {
-    display: block;
-}
-
-.hide-on-desktop {
-    display: block;
-}
-
-.show-on-mobile {
-    display: none;
-}
-
-.show-on-tablet {
-    display: none;
-}
-
-.show-on-desktop {
-    display: none;
-}
-
-/* Breakpoints para utilidades */
-@media (max-width: 768px) {
-    .hide-on-mobile {
-        display: none !important;
-    }
-    
-    .show-on-mobile {
-        display: block !important;
-    }
-}
-
 @media (max-width: 1024px) and (min-width: 769px) {
-    .hide-on-tablet {
-        display: none !important;
+    .main-content {
+        margin-left: var(--sidebar-width-tablet);
     }
-    
-    .show-on-tablet {
-        display: block !important;
+
+    .sidebar {
+        width: var(--sidebar-width-tablet);
+    }
+
+    .sales-view,
+    .inventory,
+    .historial-container,
+    .stats-container {
+        padding: var(--space-8) var(--space-6) var(--space-8);
     }
 }
 
-@media (min-width: 1025px) {
-    .hide-on-desktop {
-        display: none !important;
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0 !important;
     }
-    
-    .show-on-desktop {
-        display: block !important;
+
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 2000;
+        width: var(--sidebar-width);
+    }
+
+    .sidebar.sidebar-mobile-active {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1500;
+        display: none;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    .mobile-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1200;
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        padding: 0.9rem 1rem;
+        background: rgba(243, 246, 251, 0.92);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(197, 210, 225, 0.7);
+    }
+
+    .mobile-menu-button {
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: 1px solid var(--border-subtle);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.88);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .mobile-menu-button span {
+        width: 18px;
+        height: 2px;
+        margin: 0 auto;
+        border-radius: 999px;
+        background: var(--text-strong);
+    }
+
+    .mobile-topbar-copy {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .mobile-topbar-label {
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .mobile-topbar-title {
+        color: var(--text-strong);
+        font-size: 1rem;
+        line-height: 1.25;
+    }
+
+    .sales-view,
+    .inventory,
+    .historial-container,
+    .stats-container {
+        min-height: calc(100vh - 72px);
+        padding: var(--space-6) var(--space-4) var(--space-8);
+    }
+
+    .page-header {
+        margin-bottom: var(--space-5);
+    }
+
+    .page-title {
+        font-size: clamp(1.55rem, 6vw, 2rem);
+    }
+
+    .page-subtitle {
+        font-size: 0.96rem;
     }
 }
-

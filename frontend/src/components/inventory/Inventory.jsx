@@ -1,47 +1,40 @@
-// ===== COMPONENTE INVENTARIO  =====
-// Este componente muestra una lista de productos con funciones básicas:
-// - Ver todos los productos en tarjetas
-// - Buscar productos por nombre
-// - Agregar nuevos productos
-// - Editar productos existentes
-// - Eliminar productos
-
-import React, { useState, useEffect, useRef } from 'react'
-import { obtenerProductos, actualizarProducto, eliminarProducto, crearProducto, formatearDinero, validarCodigoBarras } from '../../utils'
+import React, { useEffect, useRef, useState } from 'react'
+import {
+    obtenerProductos,
+    actualizarProducto,
+    eliminarProducto,
+    crearProducto,
+    formatearDinero,
+    normalizarCodigoBarras,
+    validarCodigoBarras
+} from '../../utils'
 import { useApi } from '../../hooks/useApi'
 import { useGlobalScanner } from '../../hooks/scanner'
+import Modal, { ConfirmationModal } from '../common/Modal'
 import './Inventory.css'
 
+const INVENTORY_VIEW_STORAGE_KEY = 'inventory-view-mode'
+
 export const Inventory = () => {
-    // HOOK API
     const { cargando, ejecutarPeticion } = useApi()
-
-    // ESTADOS PRINCIPALES DEL COMPONENTE
-    const [productos, setProductos] = useState([]) // Lista completa de productos
-    const [textoBusqueda, setTextoBusqueda] = useState('') // Texto del buscador
-    const [mostrarFormulario, setMostrarFormulario] = useState(false) // Si mostramos el formulario
-    const [editando, setEditando] = useState(null) // Producto que estamos editando (null = nuevo producto)
-    const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false) // Modal de confirmación para eliminar
-    const [productoAEliminar, setProductoAEliminar] = useState(null) // Producto que se va a eliminar
-    const [paginaActual, setPaginaActual] = useState(1) // Página actual para la paginación
-    const productosPorPagina = 12 // Cuántos productos mostrar por página
-
-    // ESTADO PARA EL MODAL DE ERRORES
+    const [productos, setProductos] = useState([])
+    const [textoBusqueda, setTextoBusqueda] = useState('')
+    const [mostrarFormulario, setMostrarFormulario] = useState(false)
+    const [editando, setEditando] = useState(null)
+    const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false)
+    const [productoAEliminar, setProductoAEliminar] = useState(null)
+    const [paginaActual, setPaginaActual] = useState(1)
+    const [filtroActivo, setFiltroActivo] = useState('')
+    const [viewMode, setViewMode] = useState(() => {
+        const vistaGuardada = window.localStorage.getItem(INVENTORY_VIEW_STORAGE_KEY)
+        return vistaGuardada === 'table' ? 'table' : 'grid'
+    })
     const [modal, setModal] = useState({
         isOpen: false,
         title: '',
         message: '',
-        type: 'info' // 'info', 'error', 'success', 'warning'
+        type: 'info'
     })
-
-    // REFERENCIA PARA EL CAMPO DE BÚSQUEDA (para auto-focus)
-    const campoBusquedaRef = useRef(null)
-    const esBorradoAutomatico = useRef(false) // Para distinguir entre borrado automático y manual
-
-    // ESTADO PARA MANTENER EL FILTRO ACTIVO (separado del campo de texto)
-    const [filtroActivo, setFiltroActivo] = useState('') // Este mantiene el filtro aunque se borre el campo
-
-    // Estado del formulario - aquí guardamos lo que escribe el usuario
     const [nuevoProducto, setNuevoProducto] = useState({
         name: '',
         price: '',
@@ -50,124 +43,10 @@ export const Inventory = () => {
         image: ''
     })
 
-    // CARGAR PRODUCTOS CUANDO SE ABRE EL COMPONENTE
-    useEffect(() => {
-        const cargarProductos = async () => {
-            try {
-                await ejecutarPeticion(async () => {
-                    const data = await obtenerProductos()
-                    setProductos(data)
-                })
-            } catch {
-                mostrarModal(
-                    'Error al cargar productos',
-                    'No se pudieron cargar los productos. Por favor, verifica tu conexión e intenta nuevamente.',
-                    'error'
-                )
-            }
-        }
-        cargarProductos()
-    }, [ejecutarPeticion])
+    const productosPorPagina = 12
+    const campoBusquedaRef = useRef(null)
+    const esBorradoAutomatico = useRef(false)
 
-    // Ya no necesitamos auto-focus, usamos el scanner global
-
-    // SCANNER GLOBAL PARA DETECCIÓN AUTOMÁTICA
-    const manejarCodigoEscaneado = (codigo) => {
-        console.log('Código escaneado en inventario:', codigo)
-        // Aplicar filtro inmediatamente cuando se escanea
-        setFiltroActivo(codigo)
-        // Limpiar el campo de búsqueda manual
-        setTextoBusqueda('')
-    }
-    
-    const { isScanning } = useGlobalScanner(manejarCodigoEscaneado, {
-        minLength: 8,
-        timeout: 100,
-        enabled: !mostrarFormulario && !mostrarConfirmacion, // Solo activo cuando no hay modales
-        preventOnModal: true
-    })
-
-    // AUTO-CLEAR PARA CÓDIGOS DE BARRAS DEL CAMPO MANUAL
-    // Detecta códigos escaneados en el campo manual
-    useEffect(() => {
-        // Si es un código de barras (8+ dígitos numéricos), aplicar filtro y programar auto-borrado
-        if (textoBusqueda.length >= 8 && /^[0-9]+$/.test(textoBusqueda)) {
-            // APLICAR EL FILTRO INMEDIATAMENTE
-            setFiltroActivo(textoBusqueda)
-
-            // LUEGO BORRAR EL CAMPO (pero mantener el filtro)
-            const timer = setTimeout(() => {
-                esBorradoAutomatico.current = true // Marcar que es borrado automático
-                setTextoBusqueda('')
-                // Resetear la bandera después de un momento
-                setTimeout(() => {
-                    esBorradoAutomatico.current = false
-                }, 100)
-            }, 100) // Se borra después de 0.1 segundos
-
-            return () => clearTimeout(timer)
-        }
-        // Si no es un código de barras, actualizar filtro inmediatamente
-        else if (textoBusqueda !== '') {
-            setFiltroActivo(textoBusqueda)
-        }
-    }, [textoBusqueda])
-
-    // FUNCIÓN PARA MANEJAR CAMBIOS EN EL CAMPO DE BÚSQUEDA
-    // Detecta cuando el usuario escribe manualmente
-    const manejarCambioBusqueda = (e) => {
-        const nuevoTexto = e.target.value
-        setTextoBusqueda(nuevoTexto)
-
-        // Solo limpiar filtro si NO es un borrado automático
-        if (nuevoTexto === '' && !esBorradoAutomatico.current) {
-            setFiltroActivo('')
-        }
-    }
-
-    // FUNCIÓN PARA MANEJAR PRESIONES DE TECLA
-    // Maneja Enter para buscar manualmente si es necesario
-    const manejarTeclaPresionada = (e) => {
-        if (e.key === 'Enter') {
-            // Si hay texto en el campo, aplicar filtro inmediatamente
-            if (textoBusqueda.trim()) {
-                setFiltroActivo(textoBusqueda)
-            }
-        }
-    }
-
-    // RESETEAR PÁGINA CUANDO CAMBIA EL FILTRO ACTIVO
-    // Cuando cambia el filtro activo (no el campo de texto), volvemos a la primera página
-    useEffect(() => {
-        setPaginaActual(1)
-    }, [filtroActivo])
-
-    // FILTRAR PRODUCTOS SEGÚN EL FILTRO ACTIVO (no el campo de texto)
-    // Usa el filtro que se mantiene aunque se borre el campo
-    const productosFiltrados = productos.filter(producto => {
-        // Si no hay filtro activo, mostrar todos
-        if (!filtroActivo.trim()) return true
-
-        // Filtrar según el filtro activo guardado
-        return producto.name.toLowerCase().includes(filtroActivo.toLowerCase()) ||
-            producto.barcode?.includes(filtroActivo)
-    })
-
-    // LÓGICA DE PAGINACIÓN
-    // Calculamos qué productos mostrar en la página actual
-    const indiceInicio = (paginaActual - 1) * productosPorPagina
-    const indiceFin = indiceInicio + productosPorPagina
-    const productosEnPagina = productosFiltrados.slice(indiceInicio, indiceFin)
-    const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina)
-
-    // FUNCIÓN PARA CAMBIAR DE PÁGINA
-    const cambiarPagina = (nuevaPagina) => {
-        if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
-            setPaginaActual(nuevaPagina)
-        }
-    }
-
-    // FUNCIONES PARA EL MODAL DE ERRORES
     const mostrarModal = (title, message, type = 'info') => {
         setModal({
             isOpen: true,
@@ -186,53 +65,150 @@ export const Inventory = () => {
         })
     }
 
-    // FUNCIÓN PARA MANEJAR CAMBIOS EN EL FORMULARIO
-    // Cuando el usuario escribe en cualquier campo del formulario
-    const manejarCambio = (e) => {
-        const { name, value } = e.target
-        setNuevoProducto(prev => ({
+    useEffect(() => {
+        const cargarProductos = async () => {
+            try {
+                await ejecutarPeticion(async () => {
+                    const data = await obtenerProductos()
+                    setProductos(data)
+                })
+            } catch {
+                mostrarModal(
+                    'Error al cargar productos',
+                    'No se pudieron cargar los productos. Por favor, verifica tu conexion e intenta nuevamente.',
+                    'error'
+                )
+            }
+        }
+
+        cargarProductos()
+    }, [ejecutarPeticion])
+
+    useEffect(() => {
+        window.localStorage.setItem(INVENTORY_VIEW_STORAGE_KEY, viewMode)
+    }, [viewMode])
+
+    const manejarCodigoEscaneado = (codigo) => {
+        setFiltroActivo(normalizarCodigoBarras(codigo))
+        setTextoBusqueda('')
+    }
+
+    const { isScanning } = useGlobalScanner(manejarCodigoEscaneado, {
+        minLength: 8,
+        timeout: 100,
+        enabled: !mostrarFormulario && !mostrarConfirmacion,
+        preventOnModal: true
+    })
+
+    useEffect(() => {
+        const codigoNormalizado = normalizarCodigoBarras(textoBusqueda)
+
+        if (codigoNormalizado.length >= 8 && /^\d+$/.test(codigoNormalizado)) {
+            setFiltroActivo(codigoNormalizado)
+
+            const timer = setTimeout(() => {
+                esBorradoAutomatico.current = true
+                setTextoBusqueda('')
+
+                setTimeout(() => {
+                    esBorradoAutomatico.current = false
+                }, 100)
+            }, 100)
+
+            return () => clearTimeout(timer)
+        }
+
+        if (textoBusqueda !== '') {
+            setFiltroActivo(textoBusqueda)
+        }
+    }, [textoBusqueda])
+
+    const manejarCambioBusqueda = (event) => {
+        const nuevoTexto = event.target.value
+        const nuevoTextoNormalizado = /^\d+\s*$/.test(nuevoTexto.trim()) || nuevoTexto.trim() === ''
+            ? normalizarCodigoBarras(nuevoTexto)
+            : nuevoTexto
+        setTextoBusqueda(nuevoTextoNormalizado)
+
+        if (nuevoTextoNormalizado === '' && !esBorradoAutomatico.current) {
+            setFiltroActivo('')
+        }
+    }
+
+    const manejarTeclaPresionada = (event) => {
+        const codigoNormalizado = normalizarCodigoBarras(textoBusqueda)
+
+        if (event.key === 'Enter' && textoBusqueda.trim()) {
+            setFiltroActivo(/^\d+$/.test(codigoNormalizado) ? codigoNormalizado : textoBusqueda)
+        }
+    }
+
+    useEffect(() => {
+        setPaginaActual(1)
+    }, [filtroActivo])
+
+    const productosFiltrados = productos.filter((producto) => {
+        if (!filtroActivo.trim()) return true
+
+        return (
+            producto.name.toLowerCase().includes(filtroActivo.toLowerCase()) ||
+            producto.barcode?.includes(filtroActivo)
+        )
+    })
+
+    const indiceInicio = (paginaActual - 1) * productosPorPagina
+    const indiceFin = indiceInicio + productosPorPagina
+    const productosEnPagina = productosFiltrados.slice(indiceInicio, indiceFin)
+    const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina)
+
+    const cambiarPagina = (nuevaPagina) => {
+        if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+            setPaginaActual(nuevaPagina)
+        }
+    }
+
+    const manejarCambio = (event) => {
+        const { name, value } = event.target
+        setNuevoProducto((prev) => ({
             ...prev,
             [name]: value
         }))
     }
 
-    // FUNCIÓN PARA GUARDAR UN PRODUCTO (NUEVO O EDITADO)
-    const guardarProducto = async (e) => {
-        e.preventDefault()
+    const cerrarFormulario = () => {
+        setMostrarFormulario(false)
+        setEditando(null)
+        setNuevoProducto({
+            name: '',
+            price: '',
+            stock: '',
+            barcode: '',
+            image: ''
+        })
+    }
 
-        // Validaciones básicas
+    const guardarProducto = async (event) => {
+        event.preventDefault()
+
         if (!nuevoProducto.name.trim()) {
-            mostrarModal(
-                'Error de validación',
-                'El nombre del producto es obligatorio.',
-                'error'
-            )
+            mostrarModal('Error de validacion', 'El nombre del producto es obligatorio.', 'error')
             return
         }
 
         if (!nuevoProducto.price || parseFloat(nuevoProducto.price) <= 0) {
-            mostrarModal(
-                'Error de validación',
-                'El precio debe ser un número mayor a 0.',
-                'error'
-            )
+            mostrarModal('Error de validacion', 'El precio debe ser un numero mayor a 0.', 'error')
             return
         }
 
-        if (!nuevoProducto.stock || parseInt(nuevoProducto.stock) < 0) {
-            mostrarModal(
-                'Error de validación',
-                'El stock debe ser un número igual o mayor a 0.',
-                'error'
-            )
+        if (!nuevoProducto.stock || parseInt(nuevoProducto.stock, 10) < 0) {
+            mostrarModal('Error de validacion', 'El stock debe ser un numero igual o mayor a 0.', 'error')
             return
         }
 
-        // Validar código de barras si se proporciona
         if (nuevoProducto.barcode && !validarCodigoBarras(nuevoProducto.barcode)) {
             mostrarModal(
-                'Error de validación',
-                'El código de barras ingresado no es válido. Por favor, verifica que tenga el formato correcto.',
+                'Error de validacion',
+                'El codigo de barras ingresado no es valido. Por favor, verifica el formato.',
                 'error'
             )
             return
@@ -242,7 +218,7 @@ export const Inventory = () => {
             const datosProducto = {
                 ...nuevoProducto,
                 price: parseFloat(nuevoProducto.price),
-                stock: parseInt(nuevoProducto.stock)
+                stock: parseInt(nuevoProducto.stock, 10)
             }
 
             try {
@@ -250,14 +226,14 @@ export const Inventory = () => {
                     await actualizarProducto(editando.id, datosProducto)
                     mostrarModal(
                         'Producto actualizado',
-                        `El producto "${datosProducto.name}" se ha actualizado correctamente.`,
+                        `El producto "${datosProducto.name}" se actualizo correctamente.`,
                         'success'
                     )
                 } else {
                     await crearProducto(datosProducto)
                     mostrarModal(
                         'Producto creado',
-                        `El producto "${datosProducto.name}" se ha creado correctamente.`,
+                        `El producto "${datosProducto.name}" se creo correctamente.`,
                         'success'
                     )
                 }
@@ -268,16 +244,15 @@ export const Inventory = () => {
             } catch {
                 mostrarModal(
                     'Error al guardar producto',
-                    editando ? 
-                        'No se pudo actualizar el producto. Por favor, intenta nuevamente.' :
-                        'No se pudo crear el producto. Por favor, intenta nuevamente.',
+                    editando
+                        ? 'No se pudo actualizar el producto. Por favor, intenta nuevamente.'
+                        : 'No se pudo crear el producto. Por favor, intenta nuevamente.',
                     'error'
                 )
             }
         })
     }
 
-    // FUNCIÓN PARA ABRIR EL FORMULARIO EN MODO EDICIÓN
     const editarProducto = (producto) => {
         setEditando(producto)
         setNuevoProducto({
@@ -290,15 +265,12 @@ export const Inventory = () => {
         setMostrarFormulario(true)
     }
 
-    // FUNCIÓN PARA ELIMINAR UN PRODUCTO
-    const eliminarProductoHandler = async (id) => {
-        // En lugar de usar alert, abrimos el modal de confirmación
-        const producto = productos.find(p => p.id === id)
+    const eliminarProductoHandler = (id) => {
+        const producto = productos.find((item) => item.id === id)
         setProductoAEliminar(producto)
         setMostrarConfirmacion(true)
     }
 
-    // FUNCIÓN PARA CONFIRMAR LA ELIMINACIÓN
     const confirmarEliminacion = async () => {
         await ejecutarPeticion(async () => {
             try {
@@ -306,13 +278,13 @@ export const Inventory = () => {
                 const productosActualizados = await obtenerProductos()
                 setProductos(productosActualizados)
                 setMostrarConfirmacion(false)
-                
+
                 mostrarModal(
                     'Producto eliminado',
-                    `El producto "${productoAEliminar.name}" se ha eliminado correctamente.`,
+                    `El producto "${productoAEliminar.name}" se elimino correctamente.`,
                     'success'
                 )
-                
+
                 setProductoAEliminar(null)
             } catch {
                 mostrarModal(
@@ -326,42 +298,24 @@ export const Inventory = () => {
         })
     }
 
-    // FUNCIÓN PARA CANCELAR LA ELIMINACIÓN
     const cancelarEliminacion = () => {
         setMostrarConfirmacion(false)
         setProductoAEliminar(null)
     }
 
-    // FUNCIÓN PARA CERRAR EL FORMULARIO Y LIMPIAR TODO
-    const cerrarFormulario = () => {
-        setMostrarFormulario(false)
-        setEditando(null)
-        setNuevoProducto({
-            name: '',
-            price: '',
-            stock: '',
-            barcode: '',
-            image: ''
-        })
-    }
-
-    // AQUÍ RENDERIZAMOS TODO LO QUE VE EL USUARIO
     return (
         <div className="inventory">
-            {/* TÍTULO DE LA PÁGINA */}
-            <div className="inventory-header">
-                <h2>Inventario de Productos</h2>
-                <p>Gestiona todos los productos de tu tienda</p>
+            <div className="inventory-header page-header">
+                <h2 className="page-title">Inventario de Productos</h2>
+                
             </div>
             <div className="header-separator"></div>
 
-            {/* BUSCADOR Y BOTÓN PARA AGREGAR */}
             <div className="search-section">
-
                 <input
                     ref={campoBusquedaRef}
                     type="text"
-                    placeholder="Buscar productos o escanear código..."
+                    placeholder="Buscar productos o escanear codigo..."
                     value={textoBusqueda}
                     onChange={manejarCambioBusqueda}
                     onKeyDown={manejarTeclaPresionada}
@@ -369,29 +323,49 @@ export const Inventory = () => {
                 />
 
                 <button
+                    type="button"
                     className="btn-nuevo"
                     onClick={() => setMostrarFormulario(true)}
                     disabled={cargando}
                 >
                     {cargando ? 'Cargando...' : 'Nuevo Producto'}
                 </button>
-                
-                {/* Botón para limpiar filtros */}
+
+                <div className="view-toggle">
+                    <button
+                        type="button"
+                        className={`btn-toggle ${viewMode === 'grid' ? 'active' : ''}`}
+                        onClick={() => setViewMode('grid')}
+                        title="Vista de tarjetas"
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                    </button>
+                    <button
+                        type="button"
+                        className={`btn-toggle ${viewMode === 'table' ? 'active' : ''}`}
+                        onClick={() => setViewMode('table')}
+                        title="Vista de tabla"
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M3 6h18" />
+                            <path d="M3 12h18" />
+                            <path d="M3 18h18" />
+                        </svg>
+                    </button>
+                </div>
+
                 {filtroActivo && (
                     <button
+                        type="button"
                         className="btn-clear-filter"
                         onClick={() => {
                             setFiltroActivo('')
                             setTextoBusqueda('')
-                        }}
-                        style={{
-                            padding: '12px 20px',
-                            background: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontSize: '1rem'
                         }}
                     >
                         Limpiar Filtro
@@ -399,170 +373,228 @@ export const Inventory = () => {
                 )}
             </div>
 
-            {/* INDICADORES DE ESTADO */}
             {cargando && (
-                <div className="loading-indicator">
+                <div className="feedback-panel">
                     <p>Cargando productos...</p>
                 </div>
             )}
 
-            {/* INDICADOR DE ESCANEADO */}
             {isScanning && (
-                <div className="notification info" style={{textAlign: 'center', padding: '10px', background: '#e3f2fd', color: '#1976d2', borderRadius: '8px', margin: '10px 0'}}>
-                    Escaneando código...
+                <div className="feedback-panel feedback-panel-info">
+                    Escaneando codigo...
                 </div>
             )}
 
-            {/* FORMULARIO PARA AGREGAR/EDITAR (solo se muestra cuando mostrarFormulario es true) */}
-            {mostrarFormulario && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h3>{editando ? 'Editar Producto' : 'Nuevo Producto'}</h3>
-                        <form onSubmit={guardarProducto} className="product-form">
-                            <div className="form-group">
-                                <label>Nombre:</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={nuevoProducto.name}
-                                    onChange={manejarCambio}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Precio:</label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    name="price"
-                                    value={nuevoProducto.price}
-                                    onChange={manejarCambio}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Stock:</label>
-                                <input
-                                    type="number"
-                                    name="stock"
-                                    value={nuevoProducto.stock}
-                                    onChange={manejarCambio}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Código de Barras:</label>
-                                <input
-                                    type="text"
-                                    name="barcode"
-                                    value={nuevoProducto.barcode}
-                                    onChange={manejarCambio}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>URL de Imagen:</label>
-                                <input
-                                    type="url"
-                                    name="image"
-                                    value={nuevoProducto.image}
-                                    onChange={manejarCambio}
-                                    placeholder="https://ejemplo.com/imagen.jpg"
-                                />
-                            </div>
-                            <div className="form-actions">
-                                <button type="submit" className="btn-guardar">
-                                    Guardar
-                                </button>
-                                <button type="button" onClick={cerrarFormulario} className="btn-cancelar">
-                                    Cancelar
-                                </button>
-                            </div>
-                        </form>
+            <Modal
+                isOpen={mostrarFormulario}
+                onClose={cerrarFormulario}
+                title={editando ? 'Editar Producto' : 'Nuevo Producto'}
+                size="md"
+            >
+                <form onSubmit={guardarProducto} className="product-form">
+                    <div className="form-group">
+                        <label>Nombre:</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={nuevoProducto.name}
+                            onChange={manejarCambio}
+                            required
+                        />
                     </div>
+                    <div className="form-group">
+                        <label>Precio:</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            name="price"
+                            value={nuevoProducto.price}
+                            onChange={manejarCambio}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Stock:</label>
+                        <input
+                            type="number"
+                            name="stock"
+                            value={nuevoProducto.stock}
+                            onChange={manejarCambio}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Codigo de Barras:</label>
+                        <input
+                            type="text"
+                            name="barcode"
+                            value={nuevoProducto.barcode}
+                            onChange={manejarCambio}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>URL de Imagen:</label>
+                        <input
+                            type="url"
+                            name="image"
+                            value={nuevoProducto.image}
+                            onChange={manejarCambio}
+                            placeholder="https://ejemplo.com/imagen.jpg"
+                        />
+                    </div>
+                    <div className="form-actions">
+                        <button type="submit" className="btn-guardar">
+                            Guardar
+                        </button>
+                        <button type="button" onClick={cerrarFormulario} className="btn-cancelar">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            <ConfirmationModal
+                isOpen={mostrarConfirmacion}
+                onClose={cancelarEliminacion}
+                onConfirm={confirmarEliminacion}
+                title="Confirmar eliminacion"
+                message={`Estas seguro de que quieres eliminar el producto "${productoAEliminar?.name || ''}"?`}
+                confirmText="Eliminar"
+                cancelText="Cancelar"
+            />
+
+            {viewMode === 'grid' ? (
+                <div className="products-grid">
+                    {productosEnPagina.map((producto) => (
+                        <div key={producto.id} className="product-card">
+                            <div className="product-image">
+                                {producto.image ? (
+                                    <img
+                                        src={producto.image}
+                                        alt={producto.name}
+                                        onError={(event) => {
+                                            event.target.style.display = 'none'
+                                            event.target.nextSibling.style.display = 'flex'
+                                        }}
+                                    />
+                                ) : null}
+                                <div className="product-image-placeholder" style={{ display: producto.image ? 'none' : 'flex' }}>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                        <circle cx="8.5" cy="8.5" r="1.5" />
+                                        <path d="m21 15-5-5L5 21" />
+                                    </svg>
+                                    <span>Sin imagen</span>
+                                </div>
+                            </div>
+
+                            <div className="product-content">
+                                <h3>{producto.name}</h3>
+                                <div className="product-meta">
+                                    <div className="product-meta-item">
+                                        <span className="product-meta-label">Precio</span>
+                                        <strong className="product-meta-value">{formatearDinero(producto.price)}</strong>
+                                    </div>
+                                    <div className="product-meta-item">
+                                        <span className="product-meta-label">Stock</span>
+                                        <strong className="product-meta-value">{producto.stock} unidades</strong>
+                                    </div>
+                                </div>
+
+                                <p className={`product-code ${!producto.barcode ? 'product-code-empty' : ''}`}>
+                                    {producto.barcode ? `Codigo: ${producto.barcode}` : 'Sin codigo de barras'}
+                                </p>
+
+                                <div className="product-actions">
+                                    <button
+                                        type="button"
+                                        onClick={() => editarProducto(producto)}
+                                        className="btn-edit"
+                                    >
+                                        Editar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => eliminarProductoHandler(producto.id)}
+                                        className="btn-delete"
+                                    >
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="products-table-container">
+                    <table className="products-table">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Codigo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {productosEnPagina.map((producto) => (
+                                <tr key={producto.id}>
+                                    <td className="table-image-cell">
+                                        <div className="table-product-image">
+                                            {producto.image ? (
+                                                <img
+                                                    src={producto.image}
+                                                    alt={producto.name}
+                                                    onError={(event) => {
+                                                        event.target.style.display = 'none'
+                                                        event.target.nextSibling.style.display = 'flex'
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <div className="table-product-image-placeholder" style={{ display: producto.image ? 'none' : 'flex' }}>
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                                    <path d="m21 15-5-5L5 21" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{producto.name}</td>
+                                    <td>{formatearDinero(producto.price)}</td>
+                                    <td>{producto.stock} unidades</td>
+                                    <td>{producto.barcode || '-'}</td>
+                                    <td>
+                                        <div className="table-product-actions">
+                                            <button
+                                                type="button"
+                                                onClick={() => editarProducto(producto)}
+                                                className="btn-edit"
+                                            >
+                                                Editar
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => eliminarProductoHandler(producto.id)}
+                                                className="btn-delete"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
 
-            {/* MODAL DE CONFIRMACIÓN PARA ELIMINAR */}
-            {mostrarConfirmacion && (
-                <div className="modal-overlay">
-                    <div className="modal-content modal-confirmacion">
-                        <h3>Confirmar Eliminación</h3>
-                        <p>¿Estás seguro de que quieres eliminar el producto <strong>"{productoAEliminar?.name}"</strong>?</p>
-                        <p className="advertencia">Esta acción no se puede deshacer.</p>
-                        <div className="form-actions">
-                            <button
-                                className="btn-confirmar"
-                                onClick={confirmarEliminacion}
-                            >
-                                Eliminar
-                            </button>
-                            <button
-                                className="btn-cancelar"
-                                onClick={cancelarEliminacion}
-                            >
-                                Cancelar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* LISTA DE PRODUCTOS EN TARJETAS */}
-            <div className="products-grid">
-                {productosEnPagina.map(producto => (
-                    <div key={producto.id} className="product-card">
-                        {/* Imagen del producto */}
-                        <div className="product-image">
-                            {producto.image ? (
-                                <img
-                                    src={producto.image}
-                                    alt={producto.name}
-                                    onError={(e) => {
-                                        e.target.style.display = 'none'
-                                        e.target.nextSibling.style.display = 'flex'
-                                    }}
-                                />
-                            ) : null}
-                            <div className="product-image-placeholder" style={{display: producto.image ? 'none' : 'flex'}}>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                                    <path d="m21 15-5-5L5 21"/>
-                                </svg>
-                            </div>
-                        </div>
-
-                        {/* Información del producto */}
-                        <div className="product-content">
-                            <h3>{producto.name}</h3>
-                            <p><strong>Precio:</strong> {formatearDinero(producto.price)}</p>
-                            <p><strong>Stock:</strong> {producto.stock} unidades</p>
-                            {producto.barcode && <p><strong>Código:</strong> {producto.barcode}</p>}
-
-                            {/* Botones de acción */}
-                            <div className="product-actions">
-                                <button
-                                    onClick={() => editarProducto(producto)}
-                                    className="btn-edit"
-                                >
-                                    Editar
-                                </button>
-                                <button
-                                    onClick={() => eliminarProductoHandler(producto.id)}
-                                    className="btn-delete"
-                                >
-                                    Eliminar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* CONTROLES DE PAGINACIÓN */}
             {totalPaginas > 1 && (
                 <div className="paginacion">
                     <button
+                        type="button"
                         className="btn-pagina"
                         onClick={() => cambiarPagina(paginaActual - 1)}
                         disabled={paginaActual === 1}
@@ -571,10 +603,11 @@ export const Inventory = () => {
                     </button>
 
                     <span className="info-pagina">
-                        Página {paginaActual} de {totalPaginas}
+                        Pagina {paginaActual} de {totalPaginas}
                     </span>
 
                     <button
+                        type="button"
                         className="btn-pagina"
                         onClick={() => cambiarPagina(paginaActual + 1)}
                         disabled={paginaActual === totalPaginas}
@@ -584,35 +617,28 @@ export const Inventory = () => {
                 </div>
             )}
 
-            {/* MENSAJE CUANDO NO HAY PRODUCTOS */}
             {productosFiltrados.length === 0 && (
-                <div className="no-products">
-                    {filtroActivo ?
-                        `No se encontraron productos que coincidan con "${filtroActivo}"` :
-                        'No hay productos en el inventario. ¡Agrega tu primer producto!'
-                    }
+                <div className="feedback-panel feedback-panel-empty">
+                    {filtroActivo
+                        ? `No se encontraron productos que coincidan con "${filtroActivo}"`
+                        : 'No hay productos en el inventario. Agrega tu primer producto.'}
                 </div>
             )}
 
-            {/* MODAL PERSONALIZADO PARA ERRORES */}
-            {modal.isOpen && (
-                <div className="modal-overlay">
-                    <div className={`modal-content modal-${modal.type}`}> 
-                        <div className="modal-header">
-                            <h3>{modal.title}</h3>
-                            <button className="modal-close" onClick={cerrarModal}>×</button>
-                        </div>
-                        <div className="modal-body">
-                            <p>{modal.message}</p>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-modal-ok" onClick={cerrarModal}>
-                                Aceptar
-                            </button>
-                        </div>
-                    </div>
+            <Modal
+                isOpen={modal.isOpen}
+                onClose={cerrarModal}
+                title={modal.title}
+                type={modal.type}
+                size="sm"
+            >
+                <p className="ui-modal-text">{modal.message}</p>
+                <div className="ui-modal-actions">
+                    <button type="button" className="ui-modal-button ui-modal-button-primary" onClick={cerrarModal}>
+                        Aceptar
+                    </button>
                 </div>
-            )}
+            </Modal>
         </div>
     )
 }

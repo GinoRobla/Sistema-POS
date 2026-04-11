@@ -23,3 +23,6 @@ Thumbs.db
 
 *.mp4
 screenshots/
+
+# Generador de licencias — solo uso local de Gino, no subir al repo
+keygen.html

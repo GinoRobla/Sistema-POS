@@ -1,47 +1,72 @@
+import { useEffect } from 'react'
 import './Modal.css'
 
-const Modal = ({ 
-    isOpen, 
-    onClose, 
-    title, 
-    children, 
-    type = 'default', 
+const Modal = ({
+    isOpen,
+    onClose,
+    title,
+    children,
+    type = 'default',
+    size = 'md',
     showCloseButton = true,
-    onClickOutside = true 
+    onClickOutside = true,
+    closeOnEscape = true,
+    panelClassName = '',
+    contentClassName = ''
 }) => {
+    useEffect(() => {
+        if (!isOpen || !closeOnEscape) return undefined
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                onClose()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [closeOnEscape, isOpen, onClose])
+
     if (!isOpen) return null
 
-    const handleOverlayClick = (e) => {
-        if (onClickOutside && e.target === e.currentTarget) {
+    const handleOverlayClick = (event) => {
+        if (onClickOutside && event.target === event.currentTarget) {
             onClose()
         }
     }
 
-    const getModalClass = () => {
-        const baseClass = 'modal-content'
-        switch(type) {
-            case 'success': return `${baseClass} modal-success`
-            case 'error': return `${baseClass} modal-error`
-            case 'info': return `${baseClass} modal-info`
-            case 'confirmation': return `${baseClass} modal-confirmacion`
-            default: return baseClass
-        }
-    }
-
     return (
-        <div className="modal-overlay" onClick={handleOverlayClick}>
-            <div className={getModalClass()}>
+        <div
+            className="modal-overlay ui-modal-overlay"
+            onClick={handleOverlayClick}
+            role="presentation"
+        >
+            <div
+                className={`ui-modal-panel ui-modal-${size} ui-modal-${type} ${panelClassName}`.trim()}
+                role="dialog"
+                aria-modal="true"
+                aria-label={title || 'Dialogo'}
+            >
                 {(title || showCloseButton) && (
-                    <div className="modal-header">
-                        {title && <h3>{title}</h3>}
+                    <div className="ui-modal-header">
+                        {title ? <h3 className="ui-modal-title">{title}</h3> : <span />}
                         {showCloseButton && (
-                            <button className="modal-close" onClick={onClose}>
+                            <button
+                                type="button"
+                                className="ui-modal-close"
+                                aria-label="Cerrar modal"
+                                onClick={onClose}
+                            >
                                 ×
                             </button>
                         )}
                     </div>
                 )}
-                <div className="modal-body">
+
+                <div className={`ui-modal-content ${contentClassName}`.trim()}>
                     {children}
                 </div>
             </div>
@@ -49,61 +74,25 @@ const Modal = ({
     )
 }
 
-// Componentes específicos para diferentes tipos de modales
-export const SuccessModal = ({ isOpen, onClose, title, children }) => (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} type="success">
-        {children}
-        <div className="modal-footer">
-            <button className="btn-modal-ok" onClick={onClose}>
-                OK
-            </button>
-        </div>
-    </Modal>
-)
-
-export const ErrorModal = ({ isOpen, onClose, title, children }) => (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} type="error">
-        {children}
-        <div className="modal-footer">
-            <button className="btn-modal-ok" onClick={onClose}>
-                OK
-            </button>
-        </div>
-    </Modal>
-)
-
-export const InfoModal = ({ isOpen, onClose, title, children }) => (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} type="info">
-        {children}
-        <div className="modal-footer">
-            <button className="btn-modal-ok" onClick={onClose}>
-                OK
-            </button>
-        </div>
-    </Modal>
-)
-
-export const ConfirmationModal = ({ 
-    isOpen, 
-    onClose, 
-    onConfirm, 
-    title, 
-    message, 
-    confirmText = "Confirmar", 
-    cancelText = "Cancelar" 
+export const ConfirmationModal = ({
+    isOpen,
+    onClose,
+    onConfirm,
+    title,
+    message,
+    confirmText = 'Confirmar',
+    cancelText = 'Cancelar'
 }) => (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} type="confirmation">
-        <p>{message}</p>
-        {message?.includes('eliminar') && (
-            <div className="advertencia">
-                Esta acción no se puede deshacer.
-            </div>
+    <Modal isOpen={isOpen} onClose={onClose} title={title} type="confirmation" size="sm">
+        <p className="ui-modal-text">{message}</p>
+        {message?.toLowerCase().includes('eliminar') && (
+            <div className="ui-modal-warning">Esta accion no se puede deshacer.</div>
         )}
-        <div className="modal-footer">
-            <button className="btn-cancelar" onClick={onClose}>
+        <div className="ui-modal-actions">
+            <button type="button" className="ui-modal-button ui-modal-button-secondary" onClick={onClose}>
                 {cancelText}
             </button>
-            <button className="btn-confirmar" onClick={onConfirm}>
+            <button type="button" className="ui-modal-button ui-modal-button-danger" onClick={onConfirm}>
                 {confirmText}
             </button>
         </div>

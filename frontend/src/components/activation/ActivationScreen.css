@@ -1,0 +1,161 @@
+.activation-overlay {
+    position: fixed;
+    inset: 0;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.activation-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.activation-logo {
+    text-align: center;
+}
+
+.activation-icon-svg {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(31, 111, 235, 0.35);
+}
+
+.activation-logo h1 {
+    color: #f1f5f9;
+    font-size: 22px;
+    margin: 8px 0 4px;
+}
+
+.activation-subtitle {
+    color: #94a3b8;
+    font-size: 14px;
+    margin: 0;
+}
+
+.activation-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activation-section label {
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.machine-id-box {
+    display: flex;
+    align-items: center;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px 16px;
+    gap: 12px;
+}
+
+.machine-id-text {
+    flex: 1;
+    color: #38bdf8;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-family: monospace;
+}
+
+.copy-btn {
+    background: #334155;
+    color: #f1f5f9;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.copy-btn:hover {
+    background: #475569;
+}
+
+.activation-hint {
+    color: #64748b;
+    font-size: 12px;
+    margin: 0;
+}
+
+.activation-input {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #f1f5f9;
+    font-size: 15px;
+    font-family: monospace;
+    letter-spacing: 0.05em;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.activation-input:focus {
+    border-color: #38bdf8;
+}
+
+.activation-input::placeholder {
+    color: #475569;
+    font-size: 12px;
+}
+
+.activation-error {
+    color: #f87171;
+    font-size: 13px;
+    margin: 0;
+}
+
+.activation-btn {
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.activation-btn:hover:not(:disabled) {
+    background: #0284c7;
+}
+
+.activation-btn:disabled {
+    background: #334155;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+.activation-contact {
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    margin: 0;
+}
+
+.activation-contact strong {
+    color: #94a3b8;
+}

@@ -1,794 +1,321 @@
-/* === MODALES PARA ESTADÍSTICAS === */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.18);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.modal-content {
-    background: #fff;
-    border-radius: 12px;
-    padding: 28px 32px;
-    min-width: 320px;
-    max-width: 95vw;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.18);
-    animation: modalFadeStats 0.2s ease;
-    position: relative;
-}
-
-@keyframes modalFadeStats {
-    from { opacity: 0; transform: scale(0.95); }
-    to   { opacity: 1; transform: scale(1); }
-}
-
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-.modal-header h3 {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-}
-.modal-close {
-    background: none;
+.search-btn,
+.clear-btn {
     border: none;
-    font-size: 1.5rem;
-    color: #888;
+    border-radius: 999px;
     cursor: pointer;
-    margin-left: 10px;
-}
-.modal-close:hover {
-    color: #d32f2f;
+    font-weight: 700;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.modal-body {
-    margin-bottom: 18px;
-    color: #444;
-    font-size: 1rem;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-.btn-modal-ok {
-    background: #007bff;
+.search-btn {
+    background: var(--primary);
     color: white;
-    border: none;
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.btn-modal-ok:hover {
-    background: #0056b3;
 }
 
-.modal-content.modal-error {
-    border-top: 5px solid #f44336;
+.clear-btn {
+    background: #eef3f9;
+    color: var(--text-strong);
 }
-.modal-content.modal-warning {
-    border-top: 5px solid #ff9800;
+
+.search-btn,
+.clear-btn {
+    padding: 0.85rem 1.15rem;
 }
-.modal-content.modal-success {
-    border-top: 5px solid #28a745;
+
+.search-btn:hover:not(:disabled),
+.clear-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
 }
-.modal-content.modal-info {
-    border-top: 5px solid #007bff;
-}
-/* ===== ESTILOS PARA ESTADÍSTICAS ===== */
 
 .stats-container {
-    padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-left: 350px; /* Ancho del sidebar */
-    box-sizing: border-box;
 }
 
-/* HEADER */
 .header {
-    text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 0;
+}
+
+.stats-grid,
+.content-columns {
     width: 100%;
 }
 
-.header h1 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-    margin: 0 0 10px 0;
-    font-weight: 700;
-}
-
-.header p {
-    color: #6c757d;
-    font-size: 1.1rem;
-    margin: 0;
-}
-
-.header-separator {
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #ddd, transparent);
-    margin: 20px 0 30px 0;
-}
-
-/* GRID DE ESTADÍSTICAS PRINCIPALES */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
-    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.stat-card,
+.date-filter,
+.section-card,
+.range-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(219, 228, 240, 0.95);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(6px);
 }
 
 .stat-card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border: 1px solid #e9ecef;
-    transition: transform 0.2s ease;
+    padding: 1.4rem;
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-md);
 }
 
 .stat-content h3 {
-    margin: 0 0 8px 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #6c757d;
+    margin-bottom: 0.4rem;
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-    color: #2c3e50;
+    font-size: clamp(1.8rem, 3vw, 2.3rem);
+    font-weight: 800;
+    color: var(--text-strong);
+    margin-bottom: 0.2rem;
 }
 
 .stat-detail {
-    font-size: 0.9rem;
-    color: #6c757d;
+    color: var(--text-muted);
+    line-height: 1.5;
 }
 
-/* FILTRO POR FECHAS */
 .date-filter {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border: 1px solid #e9ecef;
     width: 100%;
+    padding: 1.4rem;
+    margin-bottom: 1.75rem;
 }
 
 .date-filter-title {
-    margin: 0 0 20px 0;
-    color: #2c3e50;
-    font-size: 1.5rem;
-    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--text-strong);
+    font-size: 1.2rem;
 }
 
 .date-filter-content {
     display: flex;
+    gap: 1rem;
+    align-items: end;
     justify-content: space-between;
-    align-items: center;
-    gap: 20px;
     flex-wrap: wrap;
-    position: relative;
 }
 
 .date-inputs-center {
-    display: flex;
-    gap: 15px;
-    align-items: end;
-    justify-content: center;
     flex: 1;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-/* Estilos específicos para DateFilter en Stats */
-.stats-date-filter {
-    gap: 15px;
 }
 
 .stats-date-filter .date-inputs {
-    gap: 15px;
+    gap: 1rem;
 }
 
 .date-buttons {
     display: flex;
-    gap: 10px;
-    align-items: end;
-    justify-content: center;
-}
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    gap: 0.75rem;
+    align-items: center;
 }
 
 .input-group label {
-    font-weight: 600;
-    color: #495057;
-    font-size: 0.9rem;
+    color: var(--text-strong);
+    font-weight: 700;
 }
 
 .input-group input {
-    padding: 10px 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 1rem;
-    min-width: 140px;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    min-width: 150px;
+    background: #fff;
 }
 
 .input-group input:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: var(--primary);
 }
 
-.search-btn, .clear-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.search-btn {
-    background: #007bff;
-    color: white;
-}
-
-.search-btn:hover {
-    background: #0056b3;
-}
-
-.clear-btn {
-    background: #6c757d;
-    color: white;
-}
-
-.clear-btn:hover {
-    background: #545b62;
-}
-
-.search-btn:disabled, .clear-btn:disabled {
-    background: #dee2e6;
-    color: #6c757d;
+.search-btn:disabled,
+.clear-btn:disabled {
+    background: #c8d2dd;
+    color: #6d7f93;
     cursor: not-allowed;
-}
-
-.search-btn:disabled:hover, .clear-btn:disabled:hover {
-    background: #dee2e6;
+    transform: none;
 }
 
 .range-results {
-    margin-top: 20px;
+    margin-top: 1rem;
 }
 
 .range-card {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 1.1rem;
 }
 
 .range-card h4 {
-    margin: 0 0 15px 0;
-    color: #2c3e50;
-    text-align: center;
-    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    color: var(--text-strong);
 }
 
 .range-stats {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
 }
 
 .range-stat {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 6px;
-    text-align: center;
-    border: 1px solid #e9ecef;
+    background: #f8fbff;
+    padding: 0.95rem;
+    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
 }
 
 .range-stat .label {
     display: block;
-    font-size: 0.9rem;
-    color: #6c757d;
-    margin-bottom: 5px;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
 }
 
 .range-stat .value {
-    display: block;
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: #2c3e50;
+    font-weight: 800;
+    color: var(--text-strong);
 }
 
-/* CONTENIDO EN COLUMNAS */
 .content-columns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-bottom: 30px;
-    width: 100%;
-}
-
-/* === RESPONSIVE DESIGN === */
-
-/* Notebooks y pantallas grandes (1025px+) */
-@media (min-width: 1025px) {
-    .stats-container {
-        margin-left: 250px;
-        padding: 30px 40px;
-        max-width: 1600px;
-    }
-    
-    /* Optimizar grid para pantallas grandes */
-    .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 25px;
-    }
-    
-    /* Mejor organización de filtros para pantallas grandes - igual que tablets */
-    .date-filter-content {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        position: static;
-    }
-    
-    .date-inputs-center {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 20px;
-        position: static;
-        transform: none;
-        left: auto;
-    }
-    
-    .date-buttons {
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    
-    .input-group input {
-        min-width: 160px;
-    }
-}
-
-/* Tablets (768px - 1024px) */
-@media (max-width: 1024px) and (min-width: 769px) {
-    .stats-container {
-        margin-left: 200px;
-        padding: 20px 30px;
-    }
-    
-    /* Ajustar header para tablets */
-    .header h1 {
-        font-size: 2rem;
-    }
-    
-    /* Grid de estadísticas en tablets */
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-    
-    .stat-card {
-        padding: 20px;
-    }
-    
-    .stat-value {
-        font-size: 1.8rem;
-    }
-    
-    /* Reorganizar filtro de fechas para tablets */
-    .date-filter-content {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-        position: static;
-    }
-    
-    .date-inputs-center {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 15px;
-        position: static;
-        transform: none;
-        left: auto;
-    }
-    
-    .date-buttons {
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    
-    /* Ajustar columnas de contenido */
-    .content-columns {
-        gap: 25px;
-    }
-    
-    .section-card {
-        padding: 20px;
-    }
-    
-    /* Productos top en tablets */
-    .product-item {
-        padding: 12px;
-    }
-    
-    .product-rank {
-        width: 30px;
-        height: 30px;
-        font-size: 0.9rem;
-    }
-    
-    .product-info h4 {
-        font-size: 1rem;
-    }
-    
-    .product-stats {
-        font-size: 0.85rem;
-    }
-    
-    /* Stock items en tablets */
-    .stock-item {
-        padding: 12px;
-    }
-    
-    .stock-info h4 {
-        font-size: 0.95rem;
-    }
-}
-
-/* Tablets pequeñas y móviles (768px o menos) */
-@media (max-width: 768px) {
-    .stats-container {
-        margin-left: 0;
-        padding: 15px 20px;
-    }
-    
-    /* Header responsive */
-    .header h1 {
-        font-size: 1.8rem;
-    }
-    
-    .header p {
-        font-size: 1rem;
-    }
-    
-    /* Grid de estadísticas en una columna */
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .stat-card {
-        padding: 20px;
-        text-align: center;
-    }
-    
-    .stat-value {
-        font-size: 1.6rem;
-    }
-    
-    /* Filtro de fechas en móvil */
-    .date-filter {
-        padding: 20px;
-    }
-    
-    .date-filter-title {
-        font-size: 1.3rem;
-        margin-bottom: 15px;
-    }
-    
-    .date-filter-content {
-        flex-direction: column;
-        gap: 20px;
-        align-items: stretch;
-    }
-    
-    .date-inputs-center {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-    }
-    
-    .input-group {
-        width: 100%;
-    }
-    
-    .input-group input {
-        min-width: auto;
-        width: 100%;
-        padding: 12px 16px;
-        font-size: 1rem;
-    }
-    
-    .date-buttons {
-        justify-content: center;
-        gap: 10px;
-    }
-    
-    .search-btn,
-    .clear-btn {
-        padding: 12px 20px;
-        font-size: 1rem;
-        flex: 1;
-        max-width: 120px;
-    }
-    
-    /* Rango de resultados */
-    .range-stats {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    
-    .range-stat {
-        padding: 12px;
-    }
-    
-    .range-stat .value {
-        font-size: 1.1rem;
-    }
-    
-    /* Columnas de contenido en una sola columna */
-    .content-columns {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .section-card {
-        padding: 20px;
-    }
-    
-    .section-card h2 {
-        font-size: 1.3rem;
-        text-align: center;
-    }
-    
-    /* Productos top en móvil */
-    .products-list {
-        gap: 12px;
-    }
-    
-    .product-item {
-        padding: 12px;
-        gap: 12px;
-    }
-    
-    .product-rank {
-        width: 30px;
-        height: 30px;
-        font-size: 0.9rem;
-    }
-    
-    .product-info h4 {
-        font-size: 1rem;
-        margin-bottom: 6px;
-    }
-    
-    .product-stats {
-        flex-direction: column;
-        gap: 5px;
-        font-size: 0.85rem;
-    }
-    
-    /* Stock items en móvil */
-    .low-stock-list {
-        gap: 8px;
-    }
-    
-    .stock-item {
-        padding: 12px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-    
-    .stock-info h4 {
-        font-size: 0.95rem;
-        margin-bottom: 4px;
-    }
-    
-    .stock-level {
-        align-self: flex-end;
-        flex-direction: column;
-        gap: 4px;
-        align-items: flex-end;
-    }
-    
-    .stock-price {
-        font-size: 0.95rem;
-    }
-    
-    /* Estados responsive */
-    .loading {
-        height: 300px;
-        font-size: 1.1rem;
-    }
-    
-    .no-data {
-        padding: 30px 15px;
-        font-size: 1rem;
-    }
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
 }
 
 .section-card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border: 1px solid #e9ecef;
+    padding: 1.4rem;
 }
 
 .section-card h2 {
-    margin: 0 0 20px 0;
-    color: #2c3e50;
-    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: var(--text-strong);
+    font-size: 1.2rem;
 }
 
-/* PRODUCTOS TOP */
-.products-list {
+.products-list,
+.low-stock-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 0.85rem;
+}
+
+.product-item,
+.stock-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem;
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
 }
 
 .product-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
+    background: #f8fbff;
 }
 
 .product-rank {
-    background: #007bff;
-    color: white;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    flex-shrink: 0;
+    background: var(--primary);
+    color: white;
+    font-weight: 800;
 }
 
 .product-info {
     flex: 1;
 }
 
-.product-info h4 {
-    margin: 0 0 8px 0;
-    color: #2c3e50;
-    font-size: 1.1rem;
+.product-info h4,
+.stock-info h4 {
+    margin-bottom: 0.2rem;
+    color: var(--text-strong);
+}
+
+.product-stats,
+.stock-label {
+    color: var(--text-muted);
 }
 
 .product-stats {
     display: flex;
-    gap: 15px;
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-
-/* PRODUCTOS CON POCO STOCK - ESTILO SIMPLE */
-.low-stock-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    gap: 0.8rem;
+    flex-wrap: wrap;
 }
 
 .stock-item {
     background: white;
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 4px solid #28a745;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-left: 4px solid var(--success);
 }
 
-/* 1 o 0 unidades: rojo */
 .stock-item.no-stock {
-    border-left-color: #f44336;
-    background: #ffebee;
+    border-left-color: var(--danger);
+    background: var(--danger-soft);
 }
 
-/* 2 o 3 unidades: naranja */
 .stock-item.orange-stock {
     border-left-color: #ff9800;
-    background: #fff3e0;
+    background: #fff4e8;
 }
 
-/* 4 o 5 unidades: amarillo */
 .stock-item.yellow-stock {
-    border-left-color: #fff176;
-    background: #ffffe0;
+    border-left-color: #ddb81d;
+    background: #fffbe7;
 }
 
 .stock-item.low {
     border-left-color: #fd7e14;
-    background: #fff8f0;
-}
-
-.stock-info h4 {
-    margin: 0 0 5px 0;
-    color: #2c3e50;
-    font-size: 1rem;
-}
-
-.stock-level {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-
-.stock-label {
-    font-size: 0.85rem;
-    color: #6c757d;
+    background: #fff7ec;
 }
 
 .stock-price {
-    font-weight: 600;
-    color: #2c3e50;
-    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-strong);
 }
 
-/* ESTADOS */
-.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 400px;
-    font-size: 1.2rem;
-    color: #6c757d;
+@media (max-width: 768px) {
+    .date-filter-content,
+    .date-buttons,
+    .content-columns,
+    .range-stats,
+    .product-stats,
+    .stock-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content-columns {
+        gap: 1rem;
+    }
+
+    .date-buttons,
+    .search-btn,
+    .clear-btn {
+        width: 100%;
+    }
+
+    .range-stat,
+    .product-item,
+    .stock-item {
+        width: 100%;
+    }
+
+    .product-item,
+    .stock-item {
+        align-items: flex-start;
+    }
 }
-
-.no-data {
-    text-align: center;
-    color: #6c757d;
-    font-style: italic;
-    padding: 20px;
-}
-
-

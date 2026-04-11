@@ -33,8 +33,10 @@ app.use(express.json());
 // Importar y usar rutas
 const productRoutes = require('./routes/productRoutes');
 const saleRoutes = require('./routes/saleRoutes');
+const licenseRoutes = require('./routes/licenseRoutes');
 app.use('/api/products', productRoutes);
 app.use('/api/sales', saleRoutes);
+app.use('/api/license', licenseRoutes);
 
 // Puerto y host configurables por variable de entorno
 const PORT = process.env.PORT || 3001;

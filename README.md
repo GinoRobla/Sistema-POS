@@ -31,7 +31,7 @@
 
 ```bash
 # 1️⃣ Clonar repositorio
-git clone https://github.com/GinoRobla/proyectos-personales.git
+git clone https://github.com/GinoRobla/Sistema-POS.git
 cd "proyectos-personales/Sistema ventas"
 
 # 2️⃣ Instalar dependencias

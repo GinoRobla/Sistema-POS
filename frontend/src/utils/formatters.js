@@ -1,5 +1,5 @@
 // ===== UTILIDADES GENERALES =====
-// Funciones útiles que se usan en toda la aplicación
+// Funciones utiles que se usan en toda la aplicacion
 
 // 1. FORMATEAR DINERO EN PESOS ARGENTINOS
 export const formatearDinero = (cantidad) => {
@@ -9,31 +9,40 @@ export const formatearDinero = (cantidad) => {
     }).format(cantidad)
 }
 
-// 2. VALIDAR CÓDIGOS DE BARRAS
+// 2. NORMALIZAR Y VALIDAR CODIGOS DE BARRAS
+export const normalizarCodigoBarras = (codigo) => {
+    if (codigo == null) {
+        return ''
+    }
+
+    const codigoLimpio = String(codigo).trim().replace(/\s+/g, '')
+
+    if (!/^\d+$/.test(codigoLimpio)) {
+        return codigoLimpio
+    }
+
+    return codigoLimpio.slice(0, 13)
+}
+
 export const validarCodigoBarras = (codigo) => {
-    // Verificar que no esté vacío y que solo tenga números
     if (!codigo || typeof codigo !== 'string') {
         return false
     }
-    
-    // Limpiar espacios y verificar que tenga entre 8 y 13 dígitos
-    const codigoLimpio = codigo.trim()
+
+    const codigoLimpio = normalizarCodigoBarras(codigo)
     return /^\d{8,13}$/.test(codigoLimpio)
 }
 
-// 3. FORMATEAR FECHA Y HORA 
+// 3. FORMATEAR FECHA Y HORA
 export const formatearFechaHora = (fecha) => {
     const fechaObj = new Date(fecha)
-    
-    // Fecha en formato español
+
     const fechaFormateada = fechaObj.toLocaleDateString('es-ES')
-    
-    // Hora sin segundos
-    const horaFormateada = fechaObj.toLocaleTimeString('es-ES', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
+    const horaFormateada = fechaObj.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit'
     })
-    
+
     return `${fechaFormateada} - ${horaFormateada}`
 }
 

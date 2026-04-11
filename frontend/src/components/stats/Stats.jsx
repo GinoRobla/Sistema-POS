@@ -1,18 +1,21 @@
-// ===== COMPONENTE ESTADÍSTICAS =====
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useApi } from '../../hooks/useApi'
 import { useDateFilter } from '../../hooks/useDateFilter'
-import { obtenerEstadisticas, obtenerTopProductos, obtenerEstadisticasPorFecha, obtenerProductosPocoStock, formatearDinero } from '../../utils'
+import {
+    obtenerEstadisticas,
+    obtenerTopProductos,
+    obtenerEstadisticasPorFecha,
+    obtenerProductosPocoStock,
+    formatearDinero
+} from '../../utils'
 import DateFilter from '../common/DateFilter'
+import Modal from '../common/Modal'
 import '../common/DateFilter.css'
 import './Stats.css'
 
 export const Stats = () => {
-    // ESTADOS
     const [estadisticasRango, setEstadisticasRango] = useState(null)
     const [cargandoAnalisis, setCargandoAnalisis] = useState(false)
-
-    // MODAL PERSONALIZADO
     const [modal, setModal] = useState({
         isOpen: false,
         title: '',
@@ -20,73 +23,6 @@ export const Stats = () => {
         type: 'info'
     })
 
-    // HOOK PARA FILTRADO POR FECHAS
-    const dateFilter = useDateFilter({
-        onValidationError: (error) => {
-            mostrarModal(error.titulo, error.mensaje, error.tipo)
-        },
-        allowFutureDates: false
-    })
-
-    // HOOKS
-    const { datos: estadisticas, cargando: cargandoStats, ejecutarPeticion } = useApi()
-    const { datos: topProductos, ejecutarPeticion: ejecutarTop } = useApi()
-    const { datos: productosPocoStock, ejecutarPeticion: ejecutarPoco } = useApi()
-
-    // FUNCIONES
-    const cargarDatos = useCallback(async () => {
-        try {
-            // Cargar estadísticas básicas
-            await ejecutarPeticion(obtenerEstadisticas)
-
-            // Intentar cargar top productos y productos con poco stock
-            try {
-                await ejecutarTop(obtenerTopProductos)
-            } catch {
-                mostrarModal(
-                    'Advertencia',
-                    'No se pudieron cargar los productos más vendidos.',
-                    'warning'
-                )
-            }
-
-            try {
-                await ejecutarPoco(obtenerProductosPocoStock)
-            } catch {
-                mostrarModal(
-                    'Advertencia',
-                    'No se pudieron cargar los productos con poco stock.',
-                    'warning'
-                )
-            }
-        } catch {
-            mostrarModal(
-                'Error al cargar datos',
-                'No se pudieron cargar las estadísticas principales. Por favor, verifica tu conexión e intenta nuevamente.',
-                'error'
-            )
-        }
-    }, [ejecutarPeticion, ejecutarTop, ejecutarPoco])
-
-    // EFECTOS
-    useEffect(() => {
-        const cargarDatosIniciales = async () => {
-            try {
-                await cargarDatos()
-                // No mostrar modal de éxito en la carga inicial para no ser molesto
-            } catch {
-                mostrarModal(
-                    'Error de conexión',
-                    'No se pudieron cargar las estadísticas. Por favor, verifica tu conexión a internet.',
-                    'error'
-                )
-            }
-        }
-
-        cargarDatosIniciales()
-    }, [cargarDatos])
-
-    // FUNCIÓN PARA MOSTRAR MODAL
     const mostrarModal = (title, message, type = 'info') => {
         setModal({
             isOpen: true,
@@ -96,7 +32,6 @@ export const Stats = () => {
         })
     }
 
-    // FUNCIÓN PARA CERRAR MODAL
     const cerrarModal = () => {
         setModal({
             isOpen: false,
@@ -106,12 +41,63 @@ export const Stats = () => {
         })
     }
 
-    // FUNCIÓN PARA ANALIZAR PERIODO (COMO EN HISTORIAL)
+    const dateFilter = useDateFilter({
+        onValidationError: (error) => {
+            mostrarModal(error.titulo, error.mensaje, error.tipo)
+        },
+        allowFutureDates: false
+    })
+
+    const { datos: estadisticas, cargando: cargandoStats, ejecutarPeticion } = useApi()
+    const { datos: topProductos, ejecutarPeticion: ejecutarTop } = useApi()
+    const { datos: productosPocoStock, ejecutarPeticion: ejecutarPoco } = useApi()
+
+    const cargarDatos = useCallback(async () => {
+        try {
+            await ejecutarPeticion(obtenerEstadisticas)
+
+            try {
+                await ejecutarTop(obtenerTopProductos)
+            } catch {
+                mostrarModal('Advertencia', 'No se pudieron cargar los productos mas vendidos.', 'warning')
+            }
+
+            try {
+                await ejecutarPoco(obtenerProductosPocoStock)
+            } catch {
+                mostrarModal('Advertencia', 'No se pudieron cargar los productos con poco stock.', 'warning')
+            }
+        } catch {
+            mostrarModal(
+                'Error al cargar datos',
+                'No se pudieron cargar las estadisticas principales. Por favor, intenta nuevamente.',
+                'error'
+            )
+        }
+    }, [ejecutarPeticion, ejecutarPoco, ejecutarTop])
+
+    useEffect(() => {
+        const cargarDatosIniciales = async () => {
+            try {
+                await cargarDatos()
+            } catch {
+                mostrarModal(
+                    'Error de conexion',
+                    'No se pudieron cargar las estadisticas. Verifica tu conexion e intenta otra vez.',
+                    'error'
+                )
+            }
+        }
+
+        cargarDatosIniciales()
+    }, [cargarDatos])
+
     const analizarPeriodo = async () => {
         setCargandoAnalisis(true)
+
         try {
             const fechasAPI = dateFilter.prepararFechasParaAPI()
-            
+
             if (!fechasAPI) {
                 setCargandoAnalisis(false)
                 return
@@ -134,8 +120,8 @@ export const Stats = () => {
             }
         } catch {
             mostrarModal(
-                'Error al analizar período',
-                'No se pudieron obtener las estadísticas del período seleccionado. Por favor, intenta nuevamente.',
+                'Error al analizar periodo',
+                'No se pudieron obtener las estadisticas del periodo seleccionado. Por favor, intenta nuevamente.',
                 'error'
             )
             setEstadisticasRango(null)
@@ -144,28 +130,23 @@ export const Stats = () => {
         }
     }
 
-    // FUNCIÓN PARA LIMPIAR FILTROS
     const limpiarFiltros = () => {
         dateFilter.limpiarFiltros()
         setEstadisticasRango(null)
-
-        // Ya no mostramos modal - el cambio se ve directamente en la interfaz
     }
 
     if (cargandoStats) {
-        return <div className="loading">Cargando estadísticas...</div>
+        return <div className="feedback-panel">Cargando estadisticas...</div>
     }
 
     return (
         <div className="stats-container">
-            {/* HEADER */}
-            <div className="header">
-                <h1>Estadísticas de Ventas</h1>
-                <p>Análisis completo del rendimiento del negocio</p>
+            <div className="header page-header">
+                <h1 className="page-title">Estadisticas de Ventas</h1>
+               
             </div>
             <div className="header-separator"></div>
 
-            {/* ESTADÍSTICAS PRINCIPALES */}
             <div className="stats-grid">
                 <div className="stat-card">
                     <div className="stat-content">
@@ -207,9 +188,8 @@ export const Stats = () => {
                 </div>
             </div>
 
-            {/* FILTRO POR FECHAS */}
             <div className="date-filter">
-                <h2 className="date-filter-title">Análisis por Período</h2>
+                <h2 className="date-filter-title">Analisis por Periodo</h2>
                 <div className="date-filter-content">
                     <div className="date-inputs-center">
                         <DateFilter
@@ -225,6 +205,7 @@ export const Stats = () => {
                     </div>
                     <div className="date-buttons">
                         <button
+                            type="button"
                             onClick={analizarPeriodo}
                             className="search-btn"
                             disabled={cargandoAnalisis}
@@ -232,6 +213,7 @@ export const Stats = () => {
                             {cargandoAnalisis ? 'Analizando...' : 'Buscar'}
                         </button>
                         <button
+                            type="button"
                             onClick={limpiarFiltros}
                             className="clear-btn"
                             disabled={cargandoAnalisis}
@@ -245,7 +227,7 @@ export const Stats = () => {
                     <div className="range-results">
                         <div className="range-card">
                             <h4>
-                                Resultados{dateFilter.textoRango ? ` ${dateFilter.textoRango}` : ' del período seleccionado'}
+                                Resultados{dateFilter.textoRango ? ` ${dateFilter.textoRango}` : ' del periodo seleccionado'}
                             </h4>
                             <div className="range-stats">
                                 <div className="range-stat">
@@ -262,12 +244,10 @@ export const Stats = () => {
                 )}
             </div>
 
-            {/* CONTENIDO EN DOS COLUMNAS */}
             <div className="content-columns">
-                {/* TOP PRODUCTOS */}
                 <div className="column">
                     <div className="section-card">
-                        <h2>Top 5 Productos Más Vendidos</h2>
+                        <h2>Top 5 Productos Mas Vendidos</h2>
                         <div className="products-list">
                             {topProductos?.length > 0 ? (
                                 topProductos.map((producto, index) => (
@@ -283,33 +263,36 @@ export const Stats = () => {
                                     </div>
                                 ))
                             ) : (
-                                <div className="no-data">No hay datos de productos vendidos</div>
+                                <div className="feedback-panel feedback-panel-empty">No hay datos de productos vendidos</div>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* PRODUCTOS CON POCO STOCK */}
                 <div className="column">
                     <div className="section-card">
                         <h2>Productos con Poco Stock</h2>
                         <div className="low-stock-list">
                             {productosPocoStock?.length > 0 ? (
-                                productosPocoStock.map(producto => {
-                                    let colorClass = '';
-                                    if (producto.stock === 0 || producto.stock === 1) colorClass = 'no-stock';
-                                    else if (producto.stock === 2 || producto.stock === 3) colorClass = 'orange-stock';
-                                    else if (producto.stock === 4 || producto.stock === 5) colorClass = 'yellow-stock';
-                                    else colorClass = 'low';
+                                productosPocoStock.map((producto) => {
+                                    let colorClass = ''
+
+                                    if (producto.stock === 0 || producto.stock === 1) colorClass = 'no-stock'
+                                    else if (producto.stock === 2 || producto.stock === 3) colorClass = 'orange-stock'
+                                    else if (producto.stock === 4 || producto.stock === 5) colorClass = 'yellow-stock'
+                                    else colorClass = 'low'
+
                                     return (
                                         <div key={producto.id} className={`stock-item ${colorClass}`}>
                                             <div className="stock-info">
                                                 <h4>{producto.name}</h4>
                                                 <div className="stock-level">
                                                     <span className="stock-label">
-                                                        {producto.stock === 0 ? 'Sin stock disponible' :
-                                                            producto.stock === 1 ? '1 unidad disponible' :
-                                                            `${producto.stock} unidades disponibles`}
+                                                        {producto.stock === 0
+                                                            ? 'Sin stock disponible'
+                                                            : producto.stock === 1
+                                                                ? '1 unidad disponible'
+                                                                : `${producto.stock} unidades disponibles`}
                                                     </span>
                                                 </div>
                                             </div>
@@ -317,35 +300,30 @@ export const Stats = () => {
                                                 {formatearDinero(producto.price)}
                                             </div>
                                         </div>
-                                    );
+                                    )
                                 })
                             ) : (
-                                <div className="no-data">Todos los productos tienen stock suficiente</div>
+                                <div className="feedback-panel feedback-panel-empty">Todos los productos tienen stock suficiente</div>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* MODAL PERSONALIZADO PARA ERRORES */}
-            {modal.isOpen && (
-                <div className="modal-overlay" onClick={cerrarModal}>
-                    <div className={`modal-content modal-${modal.type}`} onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>{modal.title}</h3>
-                            <button className="modal-close" onClick={cerrarModal}>×</button>
-                        </div>
-                        <div className="modal-body">
-                            <p>{modal.message}</p>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-modal-ok" onClick={cerrarModal}>
-                                Aceptar
-                            </button>
-                        </div>
-                    </div>
+            <Modal
+                isOpen={modal.isOpen}
+                onClose={cerrarModal}
+                title={modal.title}
+                type={modal.type}
+                size="sm"
+            >
+                <p className="ui-modal-text">{modal.message}</p>
+                <div className="ui-modal-actions">
+                    <button type="button" className="ui-modal-button ui-modal-button-primary" onClick={cerrarModal}>
+                        Aceptar
+                    </button>
                 </div>
-            )}
+            </Modal>
         </div>
     )
 }

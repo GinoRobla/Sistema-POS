@@ -1,128 +1,183 @@
-// ===== COMPONENTE HISTORIAL DE VENTAS =====
-// Este componente muestra todas las ventas realizadas con filtros y detalles
-
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './Historial.css'
 import { useApi } from '../../hooks/useApi'
 import { useDateFilter } from '../../hooks/useDateFilter'
 import { obtenerVentas, obtenerProductos, formatearDinero, formatearFechaHora, contarProductos } from '../../utils'
 import DateFilter from '../common/DateFilter'
+import Modal from '../common/Modal'
+import TicketVenta from '../sales/TicketVenta'
 import '../common/DateFilter.css'
 
 export const Historial = () => {
-    // 1. ESTADOS PRINCIPALES
-    const [productos, setProductos] = useState([])   // Lista de productos para mostrar en el modal
-    const [ventas, setVentas] = useState([])           // Lista de todas las ventas
-    const [ventasFiltradas, setVentasFiltradas] = useState([]) // Ventas después de filtrar
+    const [productos, setProductos] = useState([])
+    const [ventas, setVentas] = useState([])
+    const [ventasFiltradas, setVentasFiltradas] = useState([])
+    const [paginaActual, setPaginaActual] = useState(1)
+    const [mostrarModal, setMostrarModal] = useState(false)
+    const [ventaSeleccionada, setVentaSeleccionada] = useState(null)
 
-    // 2. ESTADOS PARA PAGINACIÓN
-    const [paginaActual, setPaginaActual] = useState(1) // Página actual
-    const ventasPorPagina = 10                          // Cantidad de ventas por página
-
-    // 3. ESTADOS PARA EL MODAL DE DETALLES
-    const [mostrarModal, setMostrarModal] = useState(false)    // Si se muestra el modal
-    const [ventaSeleccionada, setVentaSeleccionada] = useState(null) // Venta del modal
-
-    // 4. HOOK PARA FILTRADO POR FECHAS
+    const ventasPorPagina = 10
     const dateFilter = useDateFilter()
-
-    // 5. HOOK PARA MANEJAR LLAMADAS AL BACKEND
     const { cargando, error, ejecutarPeticion, limpiarError } = useApi()
+    const ticketRef = useRef(null)
 
-    // 4. FUNCIÓN PARA CARGAR TODAS LAS VENTAS DESDE EL BACKEND
     const cargarVentasYProductos = async () => {
         limpiarError()
+
         try {
             const [datosVentas, datosProductos] = await Promise.all([
                 ejecutarPeticion(() => obtenerVentas()),
                 ejecutarPeticion(() => obtenerProductos())
             ])
+
             setVentas(datosVentas)
             setVentasFiltradas(datosVentas)
             setProductos(datosProductos)
-        } catch (error) {
+        } catch {
             setVentas([])
             setVentasFiltradas([])
             setProductos([])
         }
     }
 
-    // 5. FUNCIÓN PARA LIMPIAR FILTROS
     const limpiarFiltros = () => {
         dateFilter.limpiarFiltros()
-        setVentasFiltradas(ventas) // Mostrar todas las ventas
+        setVentasFiltradas(ventas)
     }
 
-    // 6. FUNCIÓN PARA ABRIR EL MODAL DE DETALLES
     const verDetalles = (venta) => {
-        // Clonar la venta y agregar nombre y código a cada item si faltan
         const ventaConNombres = {
             ...venta,
-            items: venta.items.map(item => {
-                const prod = productos.find(p => p.id === item.productId);
+            items: venta.items.map((item) => {
+                const producto = productos.find((prod) => prod.id === item.productId)
+
                 return {
                     ...item,
-                    productName: item.productName || item.name || (prod ? prod.name : 'Producto sin nombre'),
-                    barcode: item.barcode || (prod ? prod.barcode : '')
-                };
+                    productName: item.productName || item.name || (producto ? producto.name : 'Producto sin nombre'),
+                    barcode: item.barcode || (producto ? producto.barcode : '')
+                }
             })
-        };
-        setVentaSeleccionada(ventaConNombres);
-        setMostrarModal(true);
+        }
+
+        setVentaSeleccionada(ventaConNombres)
+        setMostrarModal(true)
     }
 
-    // 7. FUNCIÓN PARA CERRAR EL MODAL
     const cerrarModal = () => {
         setMostrarModal(false)
         setVentaSeleccionada(null)
     }
 
-    // 8. FUNCIÓN PARA FILTRAR LAS VENTAS POR FECHAS
-    const filtrarPorFecha = useCallback(() => {
-        const ventasFiltradas = dateFilter.filtrarPorFecha(ventas)
-        setVentasFiltradas(ventasFiltradas)
+    const imprimirTicket = () => {
+        if (!ticketRef.current) return
+        const printWindow = window.open('', '', 'width=400,height=600')
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Ticket de Venta</title>
+                <style>
+                    @page {
+                        size: 80mm auto;
+                        margin: 10mm 5mm;
+                    }
+                    @media print {
+                        body { -webkit-print-color-adjust: exact; }
+                    }
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        background: #fff;
+                    }
+                    .ticket-venta {
+                        width: 100%;
+                        max-width: 280px;
+                        font-family: 'Courier New', Courier, monospace;
+                        font-size: 13px;
+                        color: #222;
+                        background: #fff;
+                        padding: 10px 0;
+                    }
+                    .ticket-header {
+                        text-align: center;
+                        margin-bottom: 8px;
+                    }
+                    .ticket-title {
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin-bottom: 2px;
+                    }
+                    .ticket-fecha {
+                        font-size: 11px;
+                        margin-bottom: 6px;
+                    }
+                    .ticket-linea {
+                        border-top: 1px dashed #888;
+                        margin: 8px 0;
+                    }
+                    .ticket-producto {
+                        margin-bottom: 6px;
+                    }
+                    .ticket-producto-nombre {
+                        font-weight: bold;
+                    }
+                    .ticket-producto-detalle {
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                    .ticket-total {
+                        font-size: 14px;
+                        font-weight: bold;
+                        text-align: right;
+                        margin-top: 10px;
+                    }
+                    .ticket-footer {
+                        text-align: center;
+                        font-size: 11px;
+                        margin-top: 10px;
+                    }
+                </style>
+            </head>
+            <body>${ticketRef.current.innerHTML}</body>
+            </html>
+        `)
+        printWindow.document.close()
+        printWindow.focus()
+        printWindow.onafterprint = () => printWindow.close()
+        printWindow.print()
+    }
 
-        // Resetear a la primera página cuando se aplican filtros
-        setPaginaActual(1)
-    }, [dateFilter.fechaDesde, dateFilter.fechaHasta, ventas, dateFilter.filtrarPorFecha])
-
-    // 9. CALCULAR VENTAS PARA LA PÁGINA ACTUAL
     const calcularVentasPaginadas = () => {
         const indiceInicio = (paginaActual - 1) * ventasPorPagina
         const indiceFin = indiceInicio + ventasPorPagina
         return ventasFiltradas.slice(indiceInicio, indiceFin)
     }
 
-    // 10. CALCULAR TOTAL DE PÁGINAS
     const totalPaginas = Math.ceil(ventasFiltradas.length / ventasPorPagina)
 
-    // 11. FUNCIÓN PARA CAMBIAR DE PÁGINA
     const cambiarPagina = (nuevaPagina) => {
         if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
             setPaginaActual(nuevaPagina)
         }
     }
 
-    // 9. CARGAR VENTAS AL INICIAR EL COMPONENTE
     useEffect(() => {
         cargarVentasYProductos()
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-    // 10. FILTRAR CUANDO CAMBIEN LAS FECHAS
     useEffect(() => {
-        filtrarPorFecha()
-    }, [dateFilter.fechaDesde, dateFilter.fechaHasta, ventas, filtrarPorFecha])
+        const ventasEnRango = dateFilter.filtrarPorFecha(ventas)
+        setVentasFiltradas(ventasEnRango)
+        setPaginaActual(1)
+    }, [dateFilter.fechaDesde, dateFilter.fechaHasta, ventas]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className="historial-container">
-            {/* 14. TÍTULO DE LA PÁGINA */}
-            <div className="historial-header">
-                <h1>Historial de Ventas</h1>
-                <p>Consulta todas las ventas realizadas</p>
+            <div className="historial-header page-header">
+                <h1 className="page-title">Historial de Ventas</h1>
+            
             </div>
             <div className="header-separator"></div>
 
-            {/* 15. FILTROS POR FECHA */}
             <div className="filtros-container">
                 <div className="filtros-fechas">
                     <DateFilter
@@ -136,9 +191,10 @@ export const Historial = () => {
                         layout="horizontal"
                     />
                 </div>
-                
+
                 <div className="filtros-acciones">
                     <button
+                        type="button"
                         className="btn-limpiar"
                         onClick={limpiarFiltros}
                         disabled={!dateFilter.hayFiltrosActivos}
@@ -148,35 +204,20 @@ export const Historial = () => {
                 </div>
             </div>
 
-            {/* 16. MOSTRAR ERRORES */}
-            {error && (
-                <div className="error-mensaje">
-                    {error}
-                </div>
-            )}
+            {error && <div className="feedback-panel feedback-panel-danger">{error}</div>}
 
-            {/* 17. MOSTRAR CARGANDO */}
-            {cargando && (
-                <div className="cargando">
-                    Cargando ventas...
-                </div>
-            )}
+            {cargando && <div className="feedback-panel">Cargando ventas...</div>}
 
-            {/* 18. LISTA DE VENTAS */}
             {!cargando && !error && (
                 <>
                     <div className="ventas-lista">
                         {ventasFiltradas.length === 0 ? (
-                            <div className="sin-ventas">
-                                No hay ventas para mostrar
-                            </div>
+                            <div className="feedback-panel feedback-panel-empty">No hay ventas para mostrar</div>
                         ) : (
-                            calcularVentasPaginadas().map(venta => (
+                            calcularVentasPaginadas().map((venta) => (
                                 <div key={venta.id} className="venta-card">
                                     <div className="venta-info">
-                                        <div className="venta-fecha">
-                                            {formatearFechaHora(venta.createdAt)}
-                                        </div>
+                                        <div className="venta-fecha">{formatearFechaHora(venta.createdAt)}</div>
                                         <div className="venta-datos">
                                             <span className="venta-productos">
                                                 {contarProductos(venta.items)} productos
@@ -187,6 +228,7 @@ export const Historial = () => {
                                         </div>
                                     </div>
                                     <button
+                                        type="button"
                                         className="btn-detalles"
                                         onClick={() => verDetalles(venta)}
                                     >
@@ -197,10 +239,10 @@ export const Historial = () => {
                         )}
                     </div>
 
-                    {/* 19. PAGINACIÓN */}
                     {ventasFiltradas.length > 0 && totalPaginas > 1 && (
                         <div className="paginacion">
                             <button
+                                type="button"
                                 className="btn-pagina"
                                 onClick={() => cambiarPagina(paginaActual - 1)}
                                 disabled={paginaActual === 1}
@@ -209,10 +251,11 @@ export const Historial = () => {
                             </button>
 
                             <span className="info-pagina">
-                                Página {paginaActual} de {totalPaginas}
+                                Pagina {paginaActual} de {totalPaginas}
                             </span>
 
                             <button
+                                type="button"
                                 className="btn-pagina"
                                 onClick={() => cambiarPagina(paginaActual + 1)}
                                 disabled={paginaActual === totalPaginas}
@@ -224,19 +267,14 @@ export const Historial = () => {
                 </>
             )}
 
-            {/* 20. MODAL DE DETALLES */}
-            {mostrarModal && ventaSeleccionada && (
-                <div className="modal-overlay" onClick={cerrarModal}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        {/* Encabezado del modal */}
-                        <div className="modal-header">
-                            <h2>Detalles de la Venta</h2>
-                            <button className="btn-cerrar" onClick={cerrarModal}>
-                                x
-                            </button>
-                        </div>
-
-                        {/* Información general de la venta */}
+            <Modal
+                isOpen={mostrarModal && !!ventaSeleccionada}
+                onClose={cerrarModal}
+                title="Detalles de la Venta"
+                size="lg"
+            >
+                {ventaSeleccionada && (
+                    <>
                         <div className="modal-info-general">
                             <div className="info-item">
                                 <strong>Fecha y Hora:</strong> {formatearFechaHora(ventaSeleccionada.createdAt)}
@@ -249,7 +287,6 @@ export const Historial = () => {
                             </div>
                         </div>
 
-                        {/* Lista de productos comprados */}
                         <div className="modal-productos">
                             <h3>Productos Comprados:</h3>
                             <div className="productos-lista">
@@ -260,16 +297,12 @@ export const Historial = () => {
                                                 {item.productName || item.name || 'Producto sin nombre'}
                                             </div>
                                             <div className="producto-codigo">
-                                                Código: {item.barcode || 'Sin código'}
+                                                Codigo: {item.barcode || 'Sin codigo'}
                                             </div>
                                         </div>
                                         <div className="producto-detalles">
-                                            <div className="producto-cantidad">
-                                                Cantidad: {item.quantity}
-                                            </div>
-                                            <div className="producto-precio">
-                                                Precio: {formatearDinero(item.price)}
-                                            </div>
+                                            <div className="producto-cantidad">Cantidad: {item.quantity}</div>
+                                            <div className="producto-precio">Precio: {formatearDinero(item.price)}</div>
                                             <div className="producto-subtotal">
                                                 Subtotal: {formatearDinero(item.price * item.quantity)}
                                             </div>
@@ -279,15 +312,40 @@ export const Historial = () => {
                             </div>
                         </div>
 
-                        {/* Botón para cerrar */}
-                        <div className="modal-footer">
-                            <button className="btn-cerrar-modal" onClick={cerrarModal}>
+                        <div style={{ display: 'none' }}>
+                            <TicketVenta
+                                ref={ticketRef}
+                                venta={{
+                                    createdAt: ventaSeleccionada.createdAt,
+                                    total: ventaSeleccionada.total,
+                                    productos: ventaSeleccionada.items.map((item) => ({
+                                        name: item.productName || item.name || 'Producto sin nombre',
+                                        quantity: item.quantity,
+                                        price: item.price
+                                    }))
+                                }}
+                            />
+                        </div>
+
+                        <div className="ui-modal-actions">
+                            <button
+                                type="button"
+                                className="ui-modal-button ui-modal-button-secondary"
+                                onClick={imprimirTicket}
+                            >
+                                Imprimir Ticket
+                            </button>
+                            <button
+                                type="button"
+                                className="ui-modal-button ui-modal-button-primary"
+                                onClick={cerrarModal}
+                            >
                                 Cerrar
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
+                    </>
+                )}
+            </Modal>
         </div>
     )
 }

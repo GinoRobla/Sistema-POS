@@ -49,7 +49,8 @@ function iniciarBackend() {
         backendProcess = spawn('node', ['index.js'], {
             cwd: backendPath,
             env: { ...process.env, NODE_ENV: 'production' },
-            stdio: 'inherit'
+            stdio: 'ignore',
+            windowsHide: true
         });
 
         backendProcess.on('error', (error) => {

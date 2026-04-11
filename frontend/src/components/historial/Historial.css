@@ -1,241 +1,65 @@
-/* === MODAL DE DETALLES DE VENTA === */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.18); /* Fondo neutro, sin celeste */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.modal-content {
-    background: #fff;
-    border-radius: 14px;
-    padding: 32px 36px;
-    min-width: 340px;
-    max-width: 95vw;
-    box-shadow: 0 4px 18px rgba(52,152,219,0.18);
-    animation: modalFadeHist 0.2s ease;
-    position: relative;
-}
-
-@keyframes modalFadeHist {
-    from { opacity: 0; transform: scale(0.95); }
-    to   { opacity: 1; transform: scale(1); }
-}
-
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 18px;
-}
-.modal-header h2 {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #3f3f3f;
-    margin: 0;
-}
-.btn-cerrar {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #888;
-    cursor: pointer;
-    margin-left: 10px;
-    transition: color 0.2s;
-}
-.btn-cerrar:hover {
-    color: #e74c3c;
-}
-
-.modal-info-general {
-    margin-bottom: 18px;
-    background: #f4f8fb;
-    border-radius: 8px;
-    padding: 14px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 1rem;
-}
-.info-item {
-    color: #2c3e50;
-}
-.total-venta {
-    font-weight: bold;
-    color: #27ae60;
-}
-
-.modal-productos {
-    margin-bottom: 18px;
-}
 .modal-productos h3 {
-    font-size: 1.1rem;
-    color: #3f3f3f;
-    margin-bottom: 10px;
-}
-.productos-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 5px;
+    color: var(--text-strong);
 }
 
-.productos-lista::-webkit-scrollbar {
-    width: 6px;
-}
-
-.productos-lista::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.productos-lista::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 3px;
-}
-
-.productos-lista::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-.producto-item {
-    background: #f8f9fa;
-    border-radius: 8px;
-    padding: 10px 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.98rem;
-    box-shadow: 0 1px 4px rgba(52,152,219,0.07);
-}
-.producto-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    color: #2c3e50;
-}
-.producto-nombre {
-    font-weight: 500;
-    color: #34495e;
-}
-.producto-codigo {
-    color: #7f8c8d;
-    font-size: 0.95rem;
-}
-.producto-detalles {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    align-items: flex-end;
-}
-.producto-cantidad {
-    color: #2980b9;
-    font-weight: 500;
-}
-.producto-precio {
-    color: #27ae60;
-    font-weight: 500;
-}
-.producto-subtotal {
-    color: #000000;
-    font-weight: 500;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-.btn-cerrar-modal {
-    background: #3498db;
-    color: white;
+.btn-detalles,
+.btn-limpiar,
+.btn-pagina {
     border: none;
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
+    border-radius: 999px;
     cursor: pointer;
-    transition: background 0.2s;
+    font-weight: 700;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
-.btn-cerrar-modal:hover {
-    background: #2980b9;
+
+.btn-detalles,
+.btn-limpiar,
+.btn-pagina {
+    background: var(--primary);
+    color: white;
+    padding: 0.8rem 1.15rem;
 }
-/* ===== ESTILOS PARA EL COMPONENTE HISTORIAL ===== */
+
+.btn-detalles:hover:not(:disabled),
+.btn-limpiar:hover:not(:disabled),
+.btn-pagina:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
 
 .historial-container {
-    padding: 2rem;
-    background-color: #f8f9fa;
-    min-height: calc(100vh - 60px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-    overflow-x: hidden;
-    /* Por defecto para desktop */
-    margin-left: 250px;
-    width: calc(100% - 250px);
 }
 
 .historial-header {
-    text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
-.historial-header h1 {
-    color: #333;
-    font-size: 2rem;
-    margin: 0 0 10px 0;
-}
-
-.historial-header p {
-    color: #666;
-    font-size: 1.1rem;
-    margin: 0;
-}
-
-/* LÍNEA SEPARADORA */
-.header-separator {
+.filtros-container,
+.ventas-lista {
     width: 100%;
-    height: 2px;
-    background-color: #ddd;
-    margin: 0 0 30px 0;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(219, 228, 240, 0.95);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(6px);
 }
 
-/* Filtros por fecha */
 .filtros-container {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 1.7rem 1.5rem;
-    margin-bottom: 2rem;
-    max-width: 1000px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+    padding: 1.4rem;
+    margin-bottom: 1.75rem;
     display: flex;
     gap: 1rem;
     align-items: end;
     flex-wrap: wrap;
     justify-content: space-between;
-    min-height: 80px;
 }
 
 .filtros-fechas {
     display: flex;
     gap: 1rem;
     align-items: end;
-    justify-content: center;
     flex: 1;
 }
 
@@ -244,94 +68,22 @@
     align-items: end;
 }
 
-.filtro-fecha {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.filtro-fecha label {
-    font-weight: 500;
-    color: #2c3e50;
-    font-size: 0.9rem;
-}
-
-.filtro-fecha input[type="date"] {
-    padding: 0.75rem;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 1rem;
-    min-width: 150px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.filtro-fecha input[type="date"]:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-.btn-limpiar {
-    padding: 0.90rem 1rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-    background-color: #1f8ccc;
-    color: #fff;
-}
-
-.btn-limpiar:hover:not(:disabled) {
-    background-color: #47a7df;
-    transform: translateY(-1px);
-}
-
-.btn-limpiar:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Mensajes */
-
-.cargando {
-    text-align: center;
-    padding: 3rem;
-    color: #7f8c8d;
-    font-size: 1.2rem;
-}
-
-.sin-ventas {
-    text-align: center;
-    padding: 3rem;
-    color: #7f8c8d;
-    font-size: 1.2rem;
-    font-weight: 500;
-}
-
-/* Lista de ventas */
 .ventas-lista {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     overflow: hidden;
-    max-width: 1000px;
-    width: 100%;
-    margin: 0 auto;
 }
 
 .venta-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e9ecef;
-    transition: background-color 0.2s;
+    gap: 1rem;
+    padding: 1.35rem 1.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background-color 0.2s ease;
 }
 
 .venta-card:hover {
-    background-color: #f8f9fa;
+    background: #f8fbff;
 }
 
 .venta-card:last-child {
@@ -343,52 +95,28 @@
 }
 
 .venta-fecha {
-    font-weight: 500;
-    color: #2c3e50;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    font-size: 1.02rem;
+    margin-bottom: 0.45rem;
 }
 
 .venta-datos {
     display: flex;
-    gap: 2rem;
+    gap: 1.4rem;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .venta-productos {
-    color: #7f8c8d;
-    font-size: 0.95rem;
+    color: var(--text-muted);
 }
 
 .venta-total {
-    font-weight: 600;
-    color: #2c3e50;
-    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--success);
 }
 
-.btn-detalles {
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: background 0.2s, transform 0.2s;
-}
-
-.btn-detalles:hover:not(:disabled) {
-    background-color: #2980b9;
-    transform: translateY(-1px);
-}
-
-.btn-detalles:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Paginación */
 .paginacion {
     display: flex;
     justify-content: center;
@@ -398,452 +126,117 @@
     padding: 1rem;
 }
 
-.btn-pagina {
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: background 0.2s, transform 0.2s;
-}
-
-.btn-pagina:hover:not(:disabled) {
-    background-color: #2980b9;
-    transform: translateY(-1px);
-}
-
-.btn-pagina:disabled {
-    background-color: #bdc3c7;
+.btn-pagina:disabled,
+.btn-limpiar:disabled {
+    background: #c8d2dd;
     cursor: not-allowed;
     transform: none;
 }
 
 .info-pagina {
-    color: #2c3e50;
-    font-weight: 500;
-    font-size: 1rem;
-    padding: 0 1rem;
+    color: var(--text-strong);
+    font-weight: 700;
 }
 
-/* === RESPONSIVE DESIGN === */
-
-/* Notebooks y pantallas grandes (1025px+) */
-@media (min-width: 1025px) {
-    .historial-container {
-        padding: 2rem 3rem;
-        margin-left: 250px;
-        width: calc(100% - 250px);
-        max-width: none;
-    }
-    
-    /* Optimizar filtros para pantallas grandes - mismo estilo que tablet */
-    .filtros-container {
-        max-width: 1400px;
-        padding: 1.5rem 0.0rem;
-        margin: 0 auto 1rem;
-        flex-direction: row;
-        gap: 2rem;
-        align-items: end;
-        justify-content: space-between;
-        min-height: 70px;
-    }
-    
-    .filtros-fechas {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 1.3rem;
-    }
-    
-    .filtros-acciones {
-        justify-content: flex-end;
-        width: auto;
-        margin-right: 1rem;
-    }
-    
-    .filtro-fecha input[type="date"] {
-        min-width: 170px;
-        padding: 0.9rem 1.2rem;
-        font-size: 1rem;
-    }
-    
-    .btn-limpiar {
-        padding: 0.9rem 1.8rem;
-        font-size: 1rem;
-        min-width: 130px;
-    }
-    
-    /* Lista de ventas optimizada */
-    .ventas-lista {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-    
-    .venta-card {
-        padding: 2rem 2.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    .venta-datos {
-        gap: 4rem;
-    }
-    
-    .venta-fecha {
-        font-size: 1.2rem;
-    }
-    
-    .venta-total {
-        font-size: 1.3rem;
-    }
-    
-    .btn-detalles {
-        padding: 1rem 2rem;
-        font-size: 1.1rem;
-    }
+.modal-info-general {
+    margin-bottom: 1rem;
+    background: #f6f9fd;
+    border-radius: 14px;
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    border: 1px solid var(--border-subtle);
 }
 
-/* Tablets (768px - 1024px) */
-@media (max-width: 1024px) and (min-width: 769px) {
-    .historial-container {
-        padding: 1.5rem;
-        margin-left: 200px;
-        width: calc(100% - 200px);
-    }
-    
-    /* Ajustar header para tablets */
-    .historial-header h1 {
-        font-size: 1.8rem;
-    }
-    
-    /* Reorganizar filtros para tablets */
-    .filtros-container {
-        flex-direction: column;
-        gap: 1.5rem;
-        padding: 1.8rem 1.5rem;
-        max-width: 90%;
-        margin: 0 auto 2rem;
-        min-height: 70px;
-        align-items: center;
-    }
-    
-    .filtros-fechas {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        width: 100%;
-    }
-    
-    .filtros-acciones {
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .filtro-fecha input[type="date"] {
-        min-width: 180px;
-        padding: 0.875rem 1rem;
-        font-size: 1rem;
-    }
-    
-    .btn-limpiar {
-        padding: 0.875rem 1.5rem;
-        font-size: 1rem;
-        min-width: 140px;
-    }
-    
-    /* Ajustar lista de ventas */
-    .ventas-lista {
-        max-width: 90%;
-        margin: 0 auto;
-    }
-    
-    .venta-card {
-        padding: 1.5rem;
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-    }
-    
-    .venta-info {
-        width: 100%;
-    }
-    
-    .venta-fecha {
-        font-size: 1.1rem;
-    }
-    
-    .venta-datos {
-        justify-content: space-between;
-        width: 100%;
-        align-items: center;
-    }
-    
-    .venta-total {
-        font-size: 1.2rem;
-        font-weight: 700;
-    }
-    
-    .btn-detalles {
-        align-self: flex-end;
-        padding: 0.875rem 2rem;
-        font-size: 1rem;
-        min-width: 120px;
-    }
-    
-    /* Modal responsive para tablets */
-    .modal-content {
-        max-width: 90vw;
-        padding: 2rem;
-    }
-    
-    .productos-lista {
-        gap: 8px;
-        max-height: 350px;
-    }
-    
-    .producto-item {
-        padding: 12px;
-        font-size: 0.95rem;
-    }
+.info-item {
+    color: var(--text-strong);
 }
 
-/* Tablets pequeñas y móviles (768px o menos) */
+.total-venta {
+    color: var(--success);
+}
+
+.modal-productos {
+    margin-bottom: 1rem;
+}
+
+.productos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 380px;
+    overflow-y: auto;
+    padding-right: 0.2rem;
+}
+
+.producto-item {
+    background: #f8fbff;
+    border-radius: 14px;
+    padding: 0.9rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid var(--border-subtle);
+}
+
+.producto-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.producto-nombre {
+    font-weight: 700;
+    color: var(--text-strong);
+}
+
+.producto-codigo {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+}
+
+.producto-detalles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: flex-end;
+    color: var(--text-strong);
+}
+
+.producto-precio,
+.producto-subtotal {
+    color: var(--success);
+}
+
 @media (max-width: 768px) {
-    /* Ajustar container principal */
-    .historial-container {
-        margin-left: 0;
-        padding: 1rem;
-        width: 100%;
-        min-height: calc(100vh - 40px);
-    }
-    
-    /* Ajustar header */
-    .historial-header h1 {
-        font-size: 1.5rem;
-    }
-    
-    .historial-header p {
-        font-size: 0.95rem;
-    }
-    
-    /* Filtros responsive para móvil */
-    .filtros-container {
-        flex-direction: column;
-        gap: 1.5rem;
-        padding: 1.8rem 1.5rem;
-        min-height: 65px;
-    }
-    
-    .filtros-fechas {
-        flex-direction: column;
-        gap: 1rem;
-        width: 100%;
-    }
-    
-    .filtro-fecha {
-        width: 100%;
-    }
-    
-    .filtro-fecha input[type="date"] {
-        min-width: auto;
-        width: 100%;
-        padding: 0.875rem;
-        font-size: 1rem;
-    }
-    
-    .filtros-acciones {
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .btn-limpiar {
-        padding: 0.875rem 1.5rem;
-        font-size: 1rem;
-    }
-    
-    /* Lista de ventas responsive */
-    .ventas-lista {
-        max-width: 100%;
-        margin: 0;
-    }
-    
-    .venta-card {
-        padding: 1rem;
-        flex-direction: column;
-        gap: 0.75rem;
-        align-items: flex-start;
-    }
-    
-    .venta-info {
-        width: 100%;
-    }
-    
-    .venta-fecha {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .venta-datos {
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: flex-start;
-        width: 100%;
-    }
-    
-    .venta-productos {
-        font-size: 0.9rem;
-    }
-    
-    .venta-total {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #27ae60;
-    }
-    
-    .btn-detalles {
-        align-self: stretch;
-        text-align: center;
-        padding: 0.875rem;
-        font-size: 1rem;
-        margin-top: 0.5rem;
-    }
-    
-    /* Paginación responsive */
+    .filtros-container,
+    .venta-card,
+    .producto-item,
     .paginacion {
         flex-direction: column;
-        gap: 1rem;
-        padding: 1.5rem;
-        max-width: 90%;
-        margin: 0 auto;
     }
-    
-    .info-pagina {
-        order: -1;
-        font-size: 1rem;
-        text-align: center;
-    }
-    
+
+    .filtros-fechas,
+    .filtros-acciones,
+    .venta-info,
+    .producto-info,
+    .producto-detalles,
+    .btn-detalles,
+    .btn-limpiar,
     .btn-pagina {
-        padding: 0.875rem 1.5rem;
-        font-size: 1rem;
-        min-width: 120px;
-        margin: 0 auto;
+        width: 100%;
     }
-    
-    /* Modal responsive para móvil */
-    .modal-content {
-        max-width: 95vw;
-        padding: 1.5rem;
-        margin: 1rem;
-    }
-    
-    .modal-header h2 {
-        font-size: 1.2rem;
-    }
-    
-    .modal-info-general {
-        padding: 1rem 1.25rem;
-        font-size: 0.95rem;
-    }
-    
-    .productos-lista {
-        gap: 8px;
-        max-height: 300px;
-    }
-    
+
+    .venta-card,
     .producto-item {
-        padding: 0.875rem;
+        align-items: flex-start;
+    }
+
+    .venta-datos {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5rem;
-        font-size: 0.9rem;
-    }
-    
-    .producto-info {
-        width: 100%;
-    }
-    
-    .producto-detalles {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .btn-cerrar-modal {
-        padding: 0.875rem 1.5rem;
-        font-size: 1rem;
-        width: 100%;
-    }
-    
-    /* Estados responsive */
-    .cargando,
-    .sin-ventas {
-        padding: 2rem 1rem;
-        font-size: 1.1rem;
+        gap: 0.35rem;
     }
 }
-
-@media (max-width: 768px) {
-    /* Ajustar container principal */
-    .historial-container {
-        margin-left: 0 !important;
-        padding: 15px !important;
-        width: 100% !important;
-    }
-    
-    /* Ajustar header */
-    .historial-header h1 {
-        font-size: 1.5rem !important;
-    }
-    
-    .historial-header p {
-        font-size: 0.9rem !important;
-    }
-    
-    /* Ajustar tabla */
-    .historial-table {
-        font-size: 0.85rem !important;
-        overflow-x: auto !important;
-    }
-    
-    .historial-table th,
-    .historial-table td {
-        padding: 8px 6px !important;
-        min-width: 100px;
-    }
-    
-    /* Hacer que la tabla sea scrolleable horizontalmente */
-    .historial-table-container {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    /* Ajustar filtros de fecha */
-    .date-filter-content {
-        flex-direction: column !important;
-        gap: 15px !important;
-    }
-    
-    .date-inputs {
-        flex-direction: column !important;
-        gap: 10px !important;
-    }
-    
-    .date-buttons {
-        justify-content: center !important;
-    }
-    
-    /* Ajustar modales */
-    .modal-content {
-        max-width: 90vw !important;
-        padding: 20px !important;
-    }
-    
-    .detalle-items {
-        font-size: 0.85rem !important;
-    }
-}
-
-
