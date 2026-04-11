@@ -42,7 +42,7 @@
       {
         "from": "backend",
         "to": "app/backend",
-        "filter": ["**/*", "!data/**"]
+        "filter": ["**/*", "!node_modules/**", "!data", "!data/**", "!.env", "!.env.*"]
       },
       {
         "from": "backend/node_modules",
