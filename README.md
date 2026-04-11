@@ -33,8 +33,8 @@
 
 ```bash
 # 1️⃣ Clonar repositorio
-git clone https://github.com/GinoRobla/sistema-ventas.git
-cd sistema-ventas
+git clone https://github.com/GinoRobla/Sistema-POS.git
+cd "Sistema-POS"
 
 # 2️⃣ Instalar dependencias
 npm install
