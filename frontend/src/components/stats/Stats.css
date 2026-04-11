@@ -80,7 +80,7 @@
 .stat-value {
     font-size: clamp(1.8rem, 3vw, 2.3rem);
     font-weight: 800;
-    color: var(--text-strong);
+    color: var(--success);
     margin-bottom: 0.2rem;
 }
 

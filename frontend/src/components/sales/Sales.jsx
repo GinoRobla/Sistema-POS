@@ -399,7 +399,7 @@ export const Sales = () => {
                     <input
                         ref={campoCodigoRef}
                         type="text"
-                        placeholder="Ingresa un codigo de barras..."
+                        placeholder="Escaneá el código o ingresá el nombre..."
                         value={codigoEscaneado}
                         onChange={manejarCambioCodigo}
                         onKeyDown={manejarEnter}
