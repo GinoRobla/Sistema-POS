@@ -5,16 +5,17 @@
 ![Sistema POS - Escaneo de Códigos](./screenshots/ventas.gif)
 *Demostración en vivo: escaneando códigos de barras y agregando productos al carrito automáticamente*
 
-## 💻 Versión de Escritorio (NUEVO)
+## 💻 Versión de Escritorio
 
-**¡Ahora disponible como aplicación de escritorio!**
+**Aplicación de escritorio lista para distribuir a clientes**
 
 - ✅ **Instalador de Windows** - Un solo archivo .exe
 - ✅ **100% Offline** - No requiere internet para funcionar
 - ✅ **Datos locales** - Base de datos SQLite incluida
 - ✅ **Fácil distribución** - Instala en cualquier PC sin dependencias
+- ✅ **Sistema de licencias** - Activación por máquina con clave de vencimiento
 
-**Ver:** [Manual de Electron](./MANUAL.md) para instrucciones de instalación y distribución.
+**Ver:** [Manual de Distribución](./MANUAL.md) para instrucciones de instalación, licencias y distribución.
 
 ## ✨ Características Principales
 
@@ -24,6 +25,7 @@
 📱 **Escaneo de Códigos** - Compatible con lectores físicos y app móvil  
 🔍 **Búsqueda Inteligente** - Por nombre, código o escaneo automático  
 📈 **Historial Completo** - Registro detallado de todas las ventas  
+🔐 **Sistema de Licencias** - Activación por máquina, claves con vencimiento configurable  
 
 ---
 
@@ -31,27 +33,30 @@
 
 ```bash
 # 1️⃣ Clonar repositorio
-git clone https://github.com/GinoRobla/Sistema-POS.git
-cd "proyectos-personales/Sistema ventas"
+git clone https://github.com/GinoRobla/sistema-ventas.git
+cd sistema-ventas
 
 # 2️⃣ Instalar dependencias
-cd backend && npm install
-cd ../frontend && npm install
+npm install
+cd backend && npm install && cd ..
+cd frontend && npm install && cd ..
 
 # 3️⃣ Configurar backend
-cd ../backend && cp .env.example .env
+cd backend && cp .env.example .env && cd ..
 
 # 4️⃣ Iniciar backend (Terminal 1)
-node index.js
+cd backend && node index.js
 
 # 5️⃣ Poblar con datos de ejemplo (Terminal 2)
-node db/seedCompleto.js
+cd backend && node db/seedCompleto.js
 
 # 6️⃣ Iniciar frontend (Terminal 3)
-cd ../frontend && npm run dev
+cd frontend && npm run dev
 ```
 
 **🎉 ¡Listo! Abre http://localhost:5173**
+
+> **Nota:** En modo desarrollo la pantalla de activación de licencia está activa. El backend debe estar corriendo para que funcione.
 
 ---
 
@@ -172,9 +177,10 @@ Conecta cualquier lector USB/Bluetooth y funciona automáticamente.
 
 ## 📚 Documentación Adicional
 
-- 📖 **[Documentación de API](./DOCUMENTACION_API.md)** - Endpoints completos
-- 🔧 **Configuración avanzada** - Variables de entorno
-- 🧪 **Datos de prueba** - Scripts de seeders incluidos
+- 📖 **[Documentación de API](./DOCUMENTACION_API.md)** - Endpoints completos (incluye /api/license)
+- 🔐 **[Manual de Distribución](./MANUAL.md)** - Licencias, instalación en clientes, respaldo
+- 🔧 **Configuración avanzada** - Variables de entorno en `backend/.env.example`
+- 🧪 **Datos de prueba** - Scripts de seeders en `backend/db/`
 
 ---
 
@@ -184,6 +190,8 @@ Conecta cualquier lector USB/Bluetooth y funciona automáticamente.
 ✅ **Base de datos local** - Sin dependencias externas  
 ✅ **Responsive design** - Optimizado para escritorio  
 ✅ **Escaneo automático** - Integración perfecta con códigos de barras  
+✅ **Sistema de licencias** - Activación por máquina con claves HMAC firmadas  
+✅ **Multi-kiosko** - Una clave única por PC, distribuible a múltiples clientes  
 
 ---
 
@@ -199,4 +207,4 @@ Conecta cualquier lector USB/Bluetooth y funciona automáticamente.
 
 **Desarrollado con ❤️ para facilitar la gestión de ventas e inventario**
 
-*Sistema POS Web v1.0 - Listo para producción* ✨
+*Sistema POS v1.0 - Versión de escritorio lista para distribución* ✨

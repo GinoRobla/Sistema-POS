@@ -1,12 +1,16 @@
 # Manual de Aplicación de Escritorio - Sistema de Ventas
 
-Este manual explica cómo usar, empaquetar y distribuir la aplicación de escritorio del Sistema de Ventas.
+Este manual explica cómo usar, empaquetar, distribuir y licenciar la aplicación de escritorio del Sistema de Ventas.
 
 ## Tabla de Contenidos
 1. [Desarrollo Local](#desarrollo-local)
 2. [Crear Instalador](#crear-instalador)
-3. [Instalar en PC del Negocio](#instalar-en-pc-del-negocio)
-4. [Solución de Problemas](#solución-de-problemas)
+3. [Sistema de Licencias](#sistema-de-licencias)
+4. [Instalar en PC del Negocio](#instalar-en-pc-del-negocio)
+5. [Base de Datos](#base-de-datos)
+6. [Solución de Problemas](#solución-de-problemas)
+7. [Desinstalación](#desinstalación)
+8. [Checklist para Distribución](#checklist-para-distribución)
 
 ---
 
@@ -125,6 +129,75 @@ Sistema de Ventas.exe (aplicación instalada)
 
 ---
 
+## Sistema de Licencias
+
+El sistema usa licencias por máquina con vencimiento configurable. Cada PC tiene un ID único y la clave solo funciona en esa PC.
+
+### Conceptos clave
+
+| Término | Descripción |
+|---------|-------------|
+| **Machine ID** | Identificador único de la PC del cliente (ej: `A1B2-C3D4-E5F6`) |
+| **Clave de activación** | `AAAAA-BBBBB-CCCCC-DDDDD\|YYYY-MM-DD` — firmada con HMAC y con fecha de vencimiento |
+| **keygen.html** | Herramienta local (solo tuya) para generar claves. **No se distribuye con el .exe** |
+
+---
+
+### Flujo completo de venta a un cliente nuevo
+
+```
+1. Cliente instala el .exe
+2. La app muestra la pantalla de activación con su Machine ID
+3. Cliente te manda el Machine ID por WhatsApp
+4. Vos abrís keygen.html en tu PC
+5. Ingresás el Machine ID y elegís el vencimiento
+6. keygen.html genera la clave → se la mandás al cliente
+7. Cliente ingresa la clave → sistema activado ✅
+```
+
+---
+
+### Generar una clave de activación
+
+1. **Abrir `keygen.html`** en tu navegador (doble clic sobre el archivo)
+
+2. **Pegar el Machine ID del cliente** en el campo correspondiente
+
+3. **Seleccionar el vencimiento:**
+   - `1 mes` / `3 meses` / `6 meses` / `1 año` — suscripción mensual
+   - `Pago único` — vence en ~100 años (nunca en la práctica)
+
+4. **Hacer clic en "Generar clave"**
+
+5. **Copiar la clave** (formato: `AAAAA-BBBBB-CCCCC-DDDDD|2026-04-11`) y mandársela al cliente por WhatsApp
+
+> **Importante:** Guardá el `keygen.html` en un lugar seguro. Si lo perdés, no podés generar nuevas claves ni renovaciones.
+
+---
+
+### Renovación de licencia
+
+Cuando la licencia del cliente vence:
+
+1. La app vuelve a mostrar la pantalla de activación automáticamente
+2. El cliente te avisa → vos generás una nueva clave con nueva fecha
+3. El cliente la ingresa y sigue usando el sistema
+
+No hay que reinstalar nada — el proceso es el mismo que la activación inicial.
+
+---
+
+### Dónde se guarda la licencia
+
+La licencia activada se guarda en:
+```
+[carpeta de instalación]\resources\app\backend\data\license.json
+```
+
+Si necesitás desactivar una licencia (por cambio de PC, fraude, etc.), eliminá ese archivo y la app volverá a pedir activación.
+
+---
+
 ## Instalar en PC del Negocio
 
 ### Requisitos del Sistema
@@ -151,9 +224,11 @@ Sistema de Ventas.exe (aplicación instalada)
    - Click en "Instalar"
 
 4. **Primera ejecución:**
-   - Al abrir por primera vez, la aplicación creará la base de datos SQLite
-   - Esto toma unos segundos
-   - Luego abrirá la ventana principal del sistema
+   - Al abrir por primera vez aparece la **pantalla de activación de licencia**
+   - El cliente ve su **Machine ID** (ej: `A1B2-C3D4-E5F6`) — debe mandártelo
+   - Vos generás la clave con `keygen.html` y se la enviás
+   - El cliente ingresa la clave → sistema desbloqueado
+   - La base de datos SQLite se crea automáticamente en el primer inicio
 
 ### Usar la Aplicación
 
@@ -167,9 +242,14 @@ Sistema de Ventas.exe (aplicación instalada)
 
 ### Ubicación de la base de datos
 
-La base de datos SQLite se guarda en:
+La base de datos SQLite se guarda dentro de la carpeta de instalación:
 ```
-C:\Users\[Usuario]\AppData\Roaming\sistema-ventas\backend\data\sistema-pos.db
+[carpeta de instalación]\resources\app\backend\data\sistema-pos.db
+```
+
+Por defecto (instalación de usuario):
+```
+C:\Users\[Usuario]\AppData\Local\Programs\Sistema de Ventas\resources\app\backend\data\sistema-pos.db
 ```
 
 ### Respaldo de datos
@@ -213,6 +293,25 @@ Guarda este archivo como `respaldo.bat` y ejecútalo cuando quieras hacer un res
 3. **Ver logs de error:**
    - Presiona `Ctrl + Shift + I` dentro de la aplicación para abrir DevTools
    - Buscar errores en la consola
+
+### Problemas con la licencia
+
+**"Clave incorrecta para esta máquina":**
+- El Machine ID que usaste para generar la clave no coincide con el de la PC
+- Pedí el Machine ID nuevamente desde la pantalla de activación y regenerá la clave
+
+**"La clave ha vencido":**
+- Generá una nueva clave con `keygen.html` con una fecha de vencimiento nueva
+
+**La pantalla de activación aparece aunque ya fue activado:**
+- El archivo `license.json` fue eliminado o la instalación cambió
+- Generá una nueva clave para el mismo Machine ID
+
+**El cliente cambió de PC:**
+- El Machine ID nuevo es diferente — el cliente debe mandarte el nuevo ID
+- Generá una clave nueva para la nueva PC
+
+---
 
 ### La base de datos no se crea
 
@@ -290,17 +389,28 @@ Si encuentras problemas:
 
 Antes de entregar la aplicación al cliente:
 
+**Preparación:**
+- [ ] Generar el instalador con `npm run dist` o `build-installer.bat`
 - [ ] Probar la instalación en una PC limpia
-- [ ] Verificar que todos los módulos funcionen (Ventas, Inventario, Estadísticas)
+- [ ] Verificar que aparece la pantalla de activación en el primer inicio
+
+**Activación:**
+- [ ] Obtener el Machine ID del cliente
+- [ ] Generar la clave con `keygen.html`
+- [ ] Verificar que la clave activa correctamente el sistema
+
+**Funcionalidad:**
+- [ ] Verificar que todos los módulos funcionen (Ventas, Inventario, Estadísticas, Historial)
 - [ ] Probar el escaneo de códigos de barras
 - [ ] Crear productos de prueba
 - [ ] Realizar ventas de prueba
 - [ ] Verificar que las estadísticas se muestren correctamente
-- [ ] Hacer respaldo de la base de datos de prueba
-- [ ] Restaurar el respaldo en otra ubicación
-- [ ] Preparar manual de usuario básico
-- [ ] Entregar el archivo `.exe` en USB
+
+**Entrega:**
+- [ ] Copiar el `.exe` en USB (carpeta `release/`)
+- [ ] Anotar la fecha de vencimiento de la licencia del cliente
 - [ ] Capacitar al usuario en el uso básico
+- [ ] Acordar proceso de renovación cuando venza la licencia
 
 ---
 
@@ -368,5 +478,5 @@ Antes de entregar la aplicación al cliente:
 
 ---
 
-**Última actualización:** Enero 2026
+**Última actualización:** Abril 2026
 **Versión:** 1.0.0

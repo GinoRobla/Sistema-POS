@@ -10,6 +10,7 @@
 - [Endpoints de Productos](#endpoints-de-productos)
 - [Endpoints de Ventas](#endpoints-de-ventas)
 - [Endpoints de Estadísticas](#endpoints-de-estadísticas)
+- [Endpoints de Licencia](#endpoints-de-licencia)
 - [Códigos de Respuesta](#códigos-de-respuesta)
 - [Ejemplos de Uso](#ejemplos-de-uso)
 
@@ -471,6 +472,91 @@ Si no se proporcionan fechas, devuelve estadísticas de todas las ventas.
 
 ---
 
+## 🔐 Endpoints de Licencia
+
+Gestionan la activación y el estado de la licencia del sistema. La licencia es por máquina — cada PC tiene un Machine ID único.
+
+### 🖥️ **GET** `/license/machine-id`
+Devuelve el identificador único de la máquina donde corre el backend. El cliente lo usa para solicitar su clave de activación.
+
+**Respuesta:**
+```json
+{
+  "machineId": "A1B2-C3D4-E5F6"
+}
+```
+
+> El Machine ID se genera a partir del hostname y la dirección MAC de la placa de red. Es estable mientras no cambie el hardware.
+
+---
+
+### 📋 **GET** `/license/status`
+Devuelve el estado actual de la licencia guardada en esta máquina.
+
+**Respuesta — licencia activa:**
+```json
+{
+  "status": "activa",
+  "expiryDate": "2026-12-31"
+}
+```
+
+**Respuesta — sin licencia o vencida:**
+```json
+{
+  "status": "inactiva"
+}
+```
+
+```json
+{
+  "status": "vencida"
+}
+```
+
+> El frontend llama a este endpoint al iniciar para decidir si mostrar la pantalla de activación o el sistema completo.
+
+---
+
+### 🔑 **POST** `/license/activate`
+Valida una clave de activación y, si es correcta, la guarda en disco.
+
+**Body (JSON):**
+```json
+{
+  "key": "AAAAA-BBBBB-CCCCC-DDDDD|2026-12-31"
+}
+```
+
+**Formato de clave:** `[HMAC-20chars]|[YYYY-MM-DD]`
+- La parte HMAC se genera con `HMAC-SHA256(SECRET, "${machineId}|${expiryDate}")`
+- La clave es válida únicamente para la máquina que tiene ese Machine ID
+- La fecha de vencimiento está embebida en la clave
+
+**Respuesta exitosa:**
+```json
+{
+  "success": true
+}
+```
+
+**Respuesta error:**
+```json
+{
+  "success": false,
+  "reason": "Clave incorrecta para esta máquina"
+}
+```
+
+Posibles valores de `reason`:
+- `"Formato de clave inválido"` — no tiene el separador `|` o faltan partes
+- `"Fecha de vencimiento inválida"` — la fecha no es parseable
+- `"La clave ha vencido"` — la fecha ya pasó
+- `"Clave incorrecta para esta máquina"` — el HMAC no coincide
+- `"Error al validar la clave"` — error inesperado
+
+---
+
 ## 🚦 Códigos de Respuesta
 
 | Código | Significado | Descripción |
@@ -588,4 +674,4 @@ fetch('/api/products/low-stock')
 ---
 
 **📖 Documentación API v1.0 - Sistema POS**  
-*Actualizada: Enero 2025*
+*Actualizada: Abril 2026*
