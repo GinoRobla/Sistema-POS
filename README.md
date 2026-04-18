@@ -2,8 +2,8 @@
 
 > **Sistema completo de punto de venta con escaneo de códigos de barras, gestión de inventario y estadísticas en tiempo real**
 
-![Sistema POS - Escaneo de Códigos](./screenshots/ventas.gif)
-*Demostración en vivo: escaneando códigos de barras y agregando productos al carrito automáticamente*
+![Sistema POS - Punto de Venta](./screenshots/Captura%20de%20pantalla%202026-04-18%20132448.png)
+*Vista principal del sistema de ventas con carrito de compras y resumen de cobro*
 
 ## 💻 Versión de Escritorio
 
@@ -89,28 +89,26 @@ Conecta cualquier lector USB/Bluetooth y funciona automáticamente.
 ## 🖥️ Interfaz y Navegación
 
 ### 🏠 **Ventas**
-![Sistema de Ventas - Carrito](./screenshots/ventas.gif)
-*Demostración del carrito de compras interactivo en funcionamiento*
+![Sistema de Ventas - Carrito](./screenshots/Captura%20de%20pantalla%202026-04-18%20132448.png)
 - Búsqueda y selección de productos
 - Carrito de compras interactivo
 - Finalización de ventas con impresión
 
 ### 📦 **Inventario**  
-![Gestión de Inventario](./screenshots/inventario.png)
+![Gestión de Inventario](./screenshots/Captura%20de%20pantalla%202026-04-18%20132500.png)
 - Agregar, editar y eliminar productos
 - Control de stock automático
 - Imágenes de productos
 
 ### 📊 **Estadísticas**
-![Dashboard de Estadísticas](./screenshots/estadisticas2.png)
+![Dashboard de Estadísticas](./screenshots/Captura%20de%20pantalla%202026-04-18%20132530.png)
 - Ganancias de hoy/semana/mes
 - Top productos más vendidos
 - Análisis por rangos de fecha
 - Productos con poco stock
 
 ### 📋 **Historial**
-![Historial de Ventas](./screenshots/historial.png)
-![Filtrado y Paginación](./screenshots/historial2.png)
+![Historial de Ventas](./screenshots/Captura%20de%20pantalla%202026-04-18%20132517.png)
 - Registro completo de ventas
 - Filtrado por fechas
 - Detalles de cada venta
